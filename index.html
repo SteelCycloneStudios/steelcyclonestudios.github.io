@@ -1,0 +1,1544 @@
+<html>
+<head>
+  <title>Steel Cyclone Games</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+  <style>
+    /* Update splash screen styles */
+    .splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s;
+    }
+
+    /* Base styles */
+    :root {
+      --primary-color: #ff6b6b;
+      --secondary-color: #4ecdc4;
+      --bg-color: #f8f9fa;
+      --text-color: #333;
+      --header-bg: #222;
+      --card-bg: white;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-color);
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: max-width 0.3s ease;
+    }
+
+    .app.desktop-view {
+      max-width: 1024px;
+    }
+
+    .header {
+      background: var(--header-bg);
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .mobile-menu-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: white;
+      cursor: pointer;
+      z-index: 100;
+      display: none;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      height: 100vh;
+      width: 280px;
+      background: white;
+      z-index: 1000;
+      transition: left 0.3s ease;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    }
+
+    .side-menu.active {
+      left: 0;
+    }
+
+    .side-menu-content {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .menu-header {
+      padding: 20px;
+      background: var(--header-bg);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-menu {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .menu-items {
+      padding: 20px 0;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px 20px;
+      color: #333;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+
+    .menu-item:hover, .menu-item.active {
+      background: #f5f5f5;
+      color: var(--primary-color);
+    }
+
+    .menu-item svg {
+      stroke: #666;
+    }
+
+    .menu-divider {
+      height: 1px;
+      background: #eee;
+      margin: 10px 0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      background: #333;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-tab {
+      flex: 1;
+      padding: 1rem;
+      color: white;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.3s;
+      white-space: nowrap;
+      min-width: 100px;
+    }
+
+    .nav-tab.active {
+      background: #444;
+      border-bottom: 3px solid var(--primary-color);
+    }
+
+    .workout-card {
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+      background: white;
+      margin-bottom: 20px;
+      padding: 20px;
+    }
+
+    .workout-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .exercise-item {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+    }
+
+    .progress-circle {
+      width: 40px;
+      height: 40px;
+      margin-right: 15px;
+    }
+
+    .video-container {
+      display: none;
+      margin-top: 10px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 5px;
+    }
+
+    .book-btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .book-btn:hover {
+      background: #ff5252;
+    }
+
+    .book-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .notification {
+      padding: 1rem;
+      background: #f8d7da;
+      color: #721c24;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+
+    .tab-content {
+      display: none; 
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .workout-complete {
+      display: none;
+      text-align: center;
+      padding: 30px;
+    }
+
+    .demo-btn {
+      background: #4ecdc4;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-right: 5px;
+    }
+
+    .demo-btn:hover {
+      background: #45b7ae;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      background: var(--header-bg);
+      color: white;
+      margin-top: auto;
+      font-size: 0.9rem;
+    }
+
+    /* Additional styles */
+    .hero {
+      position: relative;
+      height: 400px;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .slide.active {
+      opacity: 1;
+    }
+
+    .slider-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 2;
+    }
+
+    .slider-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      border: none;
+    }
+
+    .slider-dot.active {
+      background: white;
+    }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding: 1rem;
+    }
+
+    .category-card {
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+
+    .category-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .category-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .category-info {
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .product-slider {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .product-card {
+      flex: 0 0 250px;
+      scroll-snap-align: start;
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .product-info {
+      padding: 1rem;
+    }
+
+    .product-name {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .product-price {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .basic-products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      margin-top: 2rem; /* Add margin to separate from other sections */
+    }
+
+    .basic-products .product-card {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .basic-products .product-image {
+      width: 100%;
+      height: 300px; /* Fixed height for consistency */
+      object-fit: contain; /* Changed to contain to prevent cropping */
+      background: #f8f9fa; /* Light background for image container */
+      padding: 1rem;
+    }
+
+    .basic-products .product-info {
+      padding: 1.5rem;
+      flex: 1;
+    }
+
+    .basic-products .product-name {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .basic-products .product-price {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    /* Accessory styles */
+    .accessories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+    }
+
+    .accessory-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .accessory-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .accessory-image {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+    }
+
+    .accessory-info {
+      padding: 1.5rem;
+    }
+
+    .accessory-name {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .accessory-description {
+      color: #666;
+      margin-bottom: 1rem;
+    }
+
+    .accessory-price {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    /* Hero content styles */
+    .hero-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: white;
+      z-index: 2;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 2rem;
+      border-radius: 10px;
+    }
+
+    .hero-content h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .hero-content p {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+
+    .cta-button:hover {
+      background: #ff5252;
+      color: white;
+      text-decoration: none;
+    }
+
+    /* FAQ styles */
+    .faq-section {
+      padding: 2rem;
+    }
+
+    .accordion-item {
+      margin-bottom: 1rem;
+      border: 1px solid rgba(0,0,0,.125);
+      border-radius: 0.5rem;
+    }
+
+    .accordion-button {
+      padding: 1.25rem;
+      font-weight: 500;
+      background-color: white;
+      border: none;
+      border-radius: 0.5rem !important;
+    }
+
+    .accordion-button:not(.collapsed) {
+      color: var(--primary-color);
+      background-color: rgba(255, 107, 107, 0.1);
+    }
+
+    .accordion-button:focus {
+      box-shadow: none;
+      border-color: rgba(255, 107, 107, 0.25);
+    }
+
+    .accordion-body {
+      padding: 1.25rem;
+    }
+
+    .category-detail {
+      padding: 2rem;
+      background: #fff;
+      margin: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .category-header {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .category-header h2 {
+      font-size: 2rem;
+      margin: 1rem 0;
+    }
+
+    .category-header p {
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+
+    .back-button {
+      background: none;
+      border: none;
+      color: var(--primary-color);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .back-button:hover {
+      text-decoration: underline;
+    }
+
+    .category-products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+
+    .product-description {
+      color: #666;
+      font-size: 0.9rem;
+      margin: 0.5rem 0;
+    }
+
+    .menu-section .product-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .menu-section .product-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .menu-section .product-image {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+    }
+
+    .menu-section .product-info {
+      padding: 1.5rem;
+    }
+
+    /* Game section styles */
+    .game-hero {
+      position: relative;
+      overflow: hidden;
+    }
+
+    #webgl-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .game-hero .hero-content {
+      z-index: 2;
+      position: relative;
+    }
+
+    .game-category-card {
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .game-category-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .game-card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .game-card:hover {
+      transform: translateY(-10px);
+    }
+
+    .game-image {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+    }
+
+    .game-info {
+      padding: 1.5rem;
+    }
+
+    .game-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .game-description {
+      color: var(--text-color);
+      opacity: 0.8;
+      margin-bottom: 1rem;
+    }
+
+    .play-button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .play-button:hover {
+      background: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+
+    /* Footer Styles */
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px 0;
+    }
+
+    .footer-section {
+      flex: 1;
+      margin: 0 20px;
+    }
+
+    .footer-section h3 {
+      font-weight: 600;
+    }
+
+    .footer-section a {
+      display: block;
+      color: white;
+      text-decoration: none;
+    }
+
+    .footer-section a:hover {
+      text-decoration: underline;
+    }
+
+    /* Courses styles */
+    .courses-section {
+      padding: 0rem;
+    }
+
+    .course-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .course-card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .course-card:hover {
+      transform: translateY(-10px);
+    }
+
+    .course-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .course-info {
+      padding: 1.5rem;
+    }
+
+    .course-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .course-date,
+    .course-price,
+    .course-status {
+      margin: 0.5rem 0;
+      color: var(--text-color);
+    }
+
+    .course-status {
+      font-weight: 500;
+      color: var(--primary-color);
+    }
+
+    /* Music section styles */
+    .music-section .hero {
+      height: 400px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .featured-playlists {
+      padding: 2rem;
+    }
+
+    .playlist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .artist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+    }
+
+    .artist-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .artist-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .artist-info {
+      padding: 1.5rem;
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+    }
+
+    .category-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .contact-section .hero {
+      height: 300px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-form {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .contact-form svg {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .contact-form span {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .desktop-only {
+      display: flex;
+    }
+  
+    @media (max-width: 768px) {
+      .desktop-only {
+        display: none;
+      }
+      
+      .mobile-menu-icon {
+        display: block; 
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="app desktop-view">
+    <header class="header">
+      <h1>Steel Cyclone Studios</h1>
+      <div class="mobile-menu-icon" @click="toggleMenu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </div>
+    </header>
+
+    <div class="side-menu" :class="{ active: menuOpen }">
+      <div class="side-menu-content">
+        <div class="menu-header">
+          <h3>Menu</h3>
+          <button class="close-menu" @click="toggleMenu">&#xd7;</button>
+        </div>
+        <div class="menu-items">
+          <a href="#" class="menu-item" 
+             v-for="tab in tabs" 
+             :key="tab.id" 
+             @click.prevent="selectTab(tab.id)"
+             :class="{ active: currentTab === tab.id }">
+            {{ tab.name }}
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav-tabs desktop-only">
+      <div v-for="tab in tabs" :key="tab.id" :class="['nav-tab', { active: currentTab === tab.id }]" @click="selectTab(tab.id)">
+        {{ tab.name }}
+      </div>
+    </nav>
+
+    <main class="content">
+      <!-- Home content -->
+      <div v-if="currentTab === 'home'" class="home-section">
+        <iframe src="home.html" style="width:100%; height:100vh; border:none;"></iframe>
+      </div>
+
+      <!-- Courses content -->
+      <div v-if="currentTab === 'courses'" class="courses-section">
+        <section class="courses">
+          <iframe src="courses.html" style="width:100%; height:100vh; border:none;"></iframe>
+        </section>
+      </div>
+
+      <!-- Contact content -->
+      <div v-if="currentTab === 'contact'" class="contact-section">
+        <section class="hero">
+          <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1423666639041-f56000c27a9a')">
+            <div class="hero-content">
+              <h1>Contact Us</h1>
+              <p>We'd Love to Hear From You</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="contact-content">
+          <div class="container py-5">
+            <div class="contact-form bg-white p-4 rounded shadow">
+              <h3 class="mb-4">Get in Touch</h3>
+              <div class="row mb-4">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                      <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9cefe8f9f9f0ffe5fff0f3f2f9efe8e9f8f5f3efdcfbf1fdf5f0b2fff3f1">[email&#160;protected]</a></span>
+                  </div>
+                  <div class="mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <span>Richmond, KY</span>
+                  </div>
+                </div>
+              </div>
+              <hr class="mb-4">
+              <h3 class="mb-4">Send us a Message</h3>
+              <form @submit.prevent="submitForm">
+                <div class="mb-3">
+                  <label for="name" class="form-label">Name</label>
+                  <input type="text" class="form-control" id="name" required>
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="email" required>
+                </div>
+                <div class="mb-3">
+                  <label for="subject" class="form-label">Subject</label>
+                  <input type="text" class="form-control" id="subject" required>
+                </div>
+                <div class="mb-3">
+                  <label for="message" class="form-label">Message</label>
+                  <textarea class="form-control" id="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn book-btn w-100">Send Message</button>
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- FAQ content -->
+      <div v-if="currentTab === 'faq'" class="faq-section">
+        <section class="hero">
+          <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1557804506-669a67965ba0')">
+            <div class="hero-content">
+              <h1>Frequently Asked Questions</h1>
+              <p>Find answers to common questions about Steel Cyclone Studios</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="container py-5">
+          <div class="accordion" id="faqAccordion">
+            <div class="accordion-item" v-for="(faq, index) in faqs" :key="index">
+              <h2 class="accordion-header" :id="'heading' + index">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse' + index" aria-expanded="false" :aria-controls="'collapse' + index">
+                  {{ faq.question }}
+                </button>
+              </h2>
+              <div :id="'collapse' + index" class="accordion-collapse collapse" :aria-labelledby="'heading' + index" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  {{ faq.answer }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Music content -->
+      <div v-if="currentTab === 'music'" class="music-section">
+        <section class="hero">
+          <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819')">
+            <div class="hero-content">
+              <h1>Music Collection</h1>
+              <p>Listen to Your Favorite Tracks</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Featured Playlists -->
+        <section class="featured-playlists">
+          <h2 class="text-center my-4">Featured Playlists</h2>
+          <div class="playlist-grid">
+            <!-- Spotify Playlist -->
+            <div class="playlist-card">
+              <iframe style="border-radius:12px" 
+                      src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator" 
+                      width="100%" 
+                      height="352" 
+                      frameBorder="0" 
+                      allowfullscreen="" 
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                      loading="lazy">
+              </iframe>
+            </div>
+            
+            <!-- Apple Music Playlist -->
+            <div class="playlist-card">
+              <iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" 
+                      frameborder="0" 
+                      height="450" 
+                      style="width:100%;max-width:660px;overflow:hidden;border-radius:12px;" 
+                      sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" 
+                      src="https://embed.music.apple.com/us/playlist/todays-hits/pl.f4d106fed2bd41149aaacabb233eb5eb">
+              </iframe>
+            </div>
+          </div>
+        </section>
+
+        <!-- Featured Artists -->
+        <section class="featured-artists">
+          <h2 class="text-center my-4">Featured Artists</h2>
+          <div class="artist-grid">
+            <div v-for="artist in artists" :key="artist.name" class="artist-card">
+              <img :src="artist.image" :alt="artist.name" class="artist-image">
+              <div class="artist-info">
+                <h3>{{ artist.name }}</h3>
+                <p>{{ artist.genre }}</p>
+                <iframe v-if="artist.soundcloud"
+                        width="100%" 
+                        height="166" 
+                        scrolling="no" 
+                        frameborder="no" 
+                        allow="autoplay" 
+                        :src="artist.soundcloud">
+                </iframe>
+                <iframe v-if="artist.youtube"
+                        width="100%"
+                        height="315"
+                        :src="artist.youtube"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                </iframe>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Music Categories -->
+        <section class="music-categories">
+          <h2 class="text-center my-4">Browse by Genre</h2>
+          <div class="category-grid">
+            <div v-for="category in musicCategories" :key="category.name" class="category-card">
+              <img :src="category.image" :alt="category.name" class="category-image">
+              <div class="category-info">
+                <h3>{{ category.name }}</h3>
+                <p>{{ category.description }}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Games content -->
+      <div v-if="currentTab === 'games'" class="games-section">
+        <iframe src="https://www.steelcyclonestudios.com/games.html" style="width:100%; height:100vh; border:none;" allowfullscreen></iframe>
+      </div>
+
+      <!-- Steel Wear content -->
+      <div v-if="currentTab === 'steel-wear'" class="steel-wear-section">
+        <iframe 
+          src="https://steel-wear.myspreadshop.com" 
+          style="width:100%; height:100vh; border:none;"
+          title="Steel Wear Shop">
+        </iframe>
+      </div>
+
+      <!-- Shoes content -->
+      <div v-if="currentTab === 'shoes'" class="shoes-section">
+        <!-- Show hero and categories only when no category is selected -->
+        <template v-if="!selectedCategory">
+          <!-- Hero Section -->
+          <section class="hero">
+            <div class="slide" v-for="(image, index) in heroImages" :key="index" :class="{ active: currentSlide === index }" :style="{ backgroundImage: `url(${image})` }">
+              <div class="hero-content">
+                <h1>Steel Cyclone Shoes</h1>
+                <p>Game, Earn, Wear</p>
+                <a href="/new-arrivals" class="cta-button">View New Arrivals</a>
+              </div>
+            </div>
+            <div class="slider-controls">
+              <button v-for="(image, index) in heroImages" :key="index" @click="setSlide(index)" :class="[ 'slider-dot', { active: currentSlide === index }]">
+              </button>
+            </div>
+          </section>
+
+          <!-- Categories Section -->
+          <section class="categories">
+            <div v-for="category in categories" :key="category.name" class="category-card" @click="handleCategoryClick(category)">
+              <img :src="category.image" :alt="category.name + ' Sneakers'" class="category-image">
+              <div class="category-info">
+                <h2 class="category-name">{{ category.name }}</h2>
+                <button class="cta-button">See More</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Featured Products Section -->
+          <section class="featured-products">
+            <h2>Featured Products</h2>
+            <div class="product-slider">
+              <div v-for="product in featuredProducts" :key="product.name" class="product-card">
+                <img :src="product.image" :alt="product.name" class="product-image">
+                <div class="product-info">
+                  <h3 class="product-name">{{ product.name }}</h3>
+                  <p class="product-price">{{ product.price }}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Basic Products Section -->
+          <section class="basic-products">
+            <div v-for="product in basicProducts" :key="product.name" class="product-card">
+              <img :src="product.image" :alt="product.name" class="product-image">
+              <div class="product-info">
+                <h3 class="product-name">{{ product.name }}</h3>
+                <p class="product-price">{{ product.price }}</p>
+              </div>
+            </div>
+          </section>
+        </template>
+
+        <!-- Show category detail when a category is selected -->
+        <section v-if="selectedCategory" class="category-detail">
+          <div class="category-header">
+            <button class="back-button" @click="selectedCategory = null">&#x2190; Back</button>
+            <h2>{{ categoryContent[selectedCategory].title }}</h2>
+            <p>{{ categoryContent[selectedCategory].description }}</p>
+          </div>
+          <div class="category-products">
+            <div v-for="product in categoryContent[selectedCategory].products" :key="product.name" class="product-card">
+              <img :src="product.image" :alt="product.name" class="product-image">
+              <div class="product-info">
+                <h3 class="product-name">{{ product.name }}</h3>
+                <p class="product-price">{{ product.price }}</p>
+                <button class="book-btn">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Community content -->
+      <div v-if="currentTab === 'community'" class="community-section">
+        <h2>Community</h2>
+        <p>Join our community through our forums and Discord.</p>
+        <a href="#" class="cta-button">Join Now</a>
+      </div>
+
+      <!-- About content -->
+      <div v-if="currentTab === 'about'" class="about-section">
+        <iframe src="about.html" style="width:100%; height:100vh; border:none;"></iframe>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Games</h3>
+          <a href="#">Action</a>
+          <a href="#">Adventure</a>
+          <a href="#">Puzzle</a>
+        </div>
+        <div class="footer-section">
+          <h3>Community</h3>
+          <a href="#">Forums</a>
+          <a href="#">Discord</a>
+          <a href="#">News</a>
+        </div>
+        <div class="footer-section">
+          <h3>About</h3>
+          <a href="#">Help Center</a>
+          <a href="#">Contact Us</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+      <p>&copy; 2012-{{ currentYear }} Steel Cyclone Studios LLC. All rights reserved.</p>
+    </footer>
+
+  </div>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  new Vue({
+    el: '#app',
+    data: {
+      currentYear: new Date().getFullYear(),
+      menuOpen: false,
+      showSettings: false,
+      currentSettingsTab: 'themes',
+      selectedTheme: 'default',
+      themes: {
+        default: {
+          '--primary-color': '#ff6b6b',
+          '--secondary-color': '#4ecdc4',
+          '--bg-color': '#f8f9fa',
+          '--text-color': '#333',
+          '--header-bg': '#222',
+          '--card-bg': 'white'
+        },
+        dark: {
+          '--primary-color': '#7c5dfa',
+          '--secondary-color': '#5eead4',
+          '--bg-color': '#141625',
+          '--text-color': '#dfe3fa',
+          '--header-bg': '#1e2139',
+          '--card-bg': '#1e2139'
+        },
+        light: {
+          '--primary-color': '#ff6b6b',
+          '--secondary-color': '#4ecdc4',
+          '--bg-color': '#ffffff',
+          '--text-color': '#141625',
+          '--header-bg': '#f8f9fa',
+          '--card-bg': '#ffffff'
+        },
+        contrast: {
+          '--primary-color': '#ffff00',
+          '--secondary-color': '#00ffff',
+          '--bg-color': '#000000',
+          '--text-color': '#ffffff',
+          '--header-bg': '#333333',
+          '--card-bg': '#222222'
+        }
+      },
+      soundEnabled: true,
+      volume: 80,
+      timeFormat: '24h',
+      currentTab: 'home',
+      heroImages: ['/top1.jpg', '/top2.jpg'],
+      categories: [{
+        image: "slamtech.jpg",
+        name: "High Top",
+        link: "/hightop"
+      }, {
+        image: "valorstep.jpg",
+        name: "Low Top",
+        link: "/lowtop"
+      }, {
+        image: "images/shoes/limited/5ps/5Ps-SapphireBlue.jpg",
+        name: "Women",
+        link: "/women"
+      }],
+      featuredProducts: [{
+        image: "images/shoes/limited/5ps/5ps-PumpkinSpice.jpg",
+        name: "5Ps Pumpkin Spice",
+        price: "159,99 €"
+      }, {
+        image: "images/shoes/limited/5ps/5Ps-SapphireBlue.jpg",
+        name: "5Ps Sapphire Blue",
+        price: "179,99 €"
+      }, {
+        image: "images/shoes/limited/5ps/5Ps-Black&Yellow.jpg",
+        name: "5Ps Black & Yellow",
+        price: "129,99 €"
+      }, {
+        image: "images/shoes/limited/5ps/5P's-CasualFly.jpg",
+        name: "5Ps CasualFly",
+        price: "169,99 €"
+      }],
+      basicProducts: [{
+        image: "slamtech.png",
+        name: "Slamtech",
+        price: "139,99 €"
+      }, {
+        image: "valorstep.png",
+        name: "ValorStep Footwear",
+        price: "189,99 €"
+      }],
+      categoryContent: {
+        'hightop': {
+          title: 'High Top Sneakers',
+          description: 'Classic high top sneakers for ultimate style and ankle support',
+          products: [{
+            image: "https://images.unsplash.com/photo-1512374382149-233c42b6a83b",
+            name: "Classic High Top",
+            price: "129,99 €"
+          }, {
+            image: "/top2.jpg",
+            name: "Urban High Top",
+            price: "149,99 €"
+          }]
+        },
+        'lowtop': {
+          title: 'Low Top Sneakers',
+          description: 'Sleek and comfortable low top designs for everyday wear',
+          products: [{
+            image: "https://images.unsplash.com/photo-1536830220630-ce146cccac84",
+            name: "Classic Low Top",
+            price: "119,99 €"
+          }, {
+            image: "https://images.unsplash.com/photo-1491553895911-0055eca6402d",
+            name: "Sport Low Top",
+            price: "139,99 €"
+          }]
+        },
+        'women': {
+          title: 'Women Sneakers',
+          description: 'Stylish and comfortable sneakers for women',
+          products: [{
+            image: "https://images.unsplash.com/photo-1536830220630-ce146cccac84",
+            name: "Women Classic Sneaker",
+            price: "119,99 €"
+          }, {
+            image: "https://images.unsplash.com/photo-1491553895911-0055eca6402d",
+            name: "Women Sport Sneaker",
+            price: "139,99 €"
+          }]
+        }
+      },
+      selectedCategory: null,
+      currentSlide: 0,
+      tabs: [{
+        id: 'home',
+        name: 'Home'
+      }, {
+        id: 'about',
+        name: 'About'
+      }, {
+        id: 'courses',
+        name: 'Courses'
+      }, {
+        id: 'games',
+        name: 'Games'
+      }, {
+        id: 'music',
+        name: 'Music'
+      }, {
+        id: 'shoes',
+        name: 'Shoes'
+      }, {
+        id: 'steel-wear',
+        name: 'Steel Wear'
+      }, {
+        id: 'faq',
+        name: 'FAQ'
+      }, {
+        id: 'contact',
+        name: 'Contact'
+      }],
+      faqs: [
+        {
+          question: "What is Steel Cyclone Studios?",
+          answer: "Steel Cyclone Studios is a gaming company focused on creating immersive gaming experiences, developing custom footwear, and building a strong gaming community."
+        },
+        {
+          question: "How can I join tournaments?",
+          answer: "You can join tournaments by registering through our Courses section. Look for upcoming tournaments and click the register button to participate."
+        },
+        {
+          question: "Do you ship internationally?",
+          answer: "Yes, we ship our shoes and merchandise internationally. Shipping costs and delivery times vary by location."
+        },
+        {
+          question: "How can I contact support?",
+          answer: "You can reach our support team through the Contact page, or email us directly at steelcyclonestudios@gmail.com"
+        }
+      ],
+      tournaments: [{
+        name: "Cyber Rush Championship",
+        date: "2024-03-15",
+        prize: "$10,000",
+        image: "/slamtech.png",
+        status: "Registering"
+      }, {
+        name: "Space Combat League",
+        date: "2024-03-20",
+        prize: "$5,000",
+        image: "/5Ps-Black&Yellow.jpg",
+        status: "Coming Soon"
+      }],
+      shoes: [{
+        id: 1,
+        name: "Valor Step Elite",
+        description: "Premium high-top sneaker with gold accents",
+        price: 159.99,
+        image: "/valorstep.jpg"
+      }, {
+        id: 2,
+        name: "Slamtech Pro",
+        description: "Professional basketball shoe with advanced cushioning",
+        price: 129.99,
+        image: "/slamtech.jpg"
+      }, {
+        id: 3,
+        name: "5P's Sapphire",
+        description: "Limited edition blue high-top sneaker",
+        price: 149.99,
+        image: "/5Ps-SapphireBlue.jpg"
+      }, {
+        id: 4,
+        name: "5P's Black & Gold",
+        description: "Classic black sneaker with gold trim",
+        price: 139.99,
+        image: "/5Ps-Black&Yellow.jpg"
+      }],
+      artists: [{
+        name: 'Steel Symphony',
+        genre: 'Electronic/Orchestral',
+        image: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d',
+        soundcloud: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/293'
+      }, {
+        name: 'Rise & Shine',
+        genre: 'Rap',
+        image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745',
+        youtube: 'https://youtube.com/embed/3BpiJS89Jdg?si=XscnTDNFKw3t9JpS'
+      }],
+      musicCategories: [{
+        name: 'Gaming Soundtracks',
+        description: 'Original compositions from our games',
+        image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f'
+      }, {
+        name: 'Electronic',
+        description: 'High-energy electronic music',
+        image: 'https://images.unsplash.com/photo-1516223725307-6f76b9182f7c'
+      }, {
+        name: 'Orchestral',
+        description: 'Epic orchestral compositions',
+        image: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6'
+      }]
+    },
+    methods: {
+      toggleMenu() {
+        this.menuOpen = !this.menuOpen;
+      },
+      selectTab(tabId) {
+        this.currentTab = tabId;
+        this.menuOpen = false; // Close menu after selection on mobile
+      },
+      openSettings() {
+        this.showSettings = true;
+        this.currentSettingsTab = 'themes';
+      },
+      setSlide(index) {
+        this.currentSlide = index;
+      },
+      startSlideshow() {
+        this.slideInterval = setInterval(() => {
+          this.nextSlide();
+        }, 5000);
+      },
+      stopSlideshow() {
+        if (this.slideInterval) {
+          clearInterval(this.slideInterval);
+        }
+      },
+      clearSelectedCategory() {
+        this.selectedCategory = null;
+      },
+      handleCategoryClick(category) {
+        if (category.name === "High Top") {
+          this.selectedCategory = 'hightop';
+          this.currentTab = 'shoes';
+        } else if (category.name === "Low Top") {
+          this.selectedCategory = 'lowtop';
+          this.currentTab = 'shoes';
+        } else if (category.name === "Women") {
+          this.selectedCategory = 'women';
+          this.currentTab = 'shoes';
+        }
+      },
+      nextSlide() {
+        this.currentSlide = (this.currentSlide + 1) % this.heroImages.length;
+      },
+      submitForm() {
+        // Get form values
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+        
+        // Here you would typically send the form data to your backend
+        console.log('Form submitted:', { name, email, subject, message });
+        
+        // Clear form
+        document.getElementById('name').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('subject').value = '';
+        document.getElementById('message').value = '';
+        
+        // Show success message (you can implement this how you prefer)
+        alert('Message sent successfully!');
+      }
+    },
+    mounted() {
+      this.startSlideshow();
+    },
+    beforeDestroy() {
+      this.stopSlideshow();
+    }
+  });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
