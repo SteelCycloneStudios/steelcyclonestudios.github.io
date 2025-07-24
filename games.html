@@ -1,0 +1,682 @@
+<html><head><base href="https://html5games.com" target="_blank"> 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML5 Games Collection</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter Tight', sans-serif;
+}
+
+:root {
+    --primary: #C0C0C0;           /* Chrome/Silver */
+    --secondary: #E8E8E8;         /* Lighter silver */
+    --background: #000000;        /* Black */
+    --text: #C0C0C0;             /* Chrome text */
+    --card-shadow: 0 10px 20px rgba(192, 192, 192, 0.2);
+    --neon-glow: 0 0 15px rgba(232, 232, 232, 0.7);
+}
+
+body {
+    background: var(--background);
+    color: var(--text);
+    line-height: 1.6;
+    background-image: 
+        linear-gradient(45deg, rgba(192, 192, 192, 0.05) 1px, transparent 1px),
+        linear-gradient(-45deg, rgba(192, 192, 192, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+    background-color: #000000;
+    position: relative;
+    overflow-x: hidden;
+}
+
+header {
+    background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7));
+    border-bottom: 2px solid var(--primary);
+    box-shadow: 0 0 20px rgba(192,192,192,0.3);
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
+}
+
+header p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    color: var(--secondary);
+}
+
+.filter-bar {
+    background: rgba(0,0,0,0.9);
+    border-bottom: 1px solid var(--primary);
+    padding: 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: var(--card-shadow);
+}
+
+.filter-bar input {
+    width: 100%;
+    max-width: 600px;
+    padding: 1rem 1.5rem;
+    border: 2px solid var(--primary);
+    border-radius: 1rem;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 0 auto;
+    background: rgba(0,0,0,0.8);
+    color: var(--primary);
+}
+
+.filter-bar input:focus {
+    outline: none;
+    box-shadow: 0 0 15px rgba(232,232,232,0.5);
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2.5rem;
+    padding: 3rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.games-grid.loading {
+    position: relative;
+    min-height: 200px;
+}
+
+.games-grid.loading::after {
+    content: "Validating and loading games...";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2rem;
+    background: var(--primary);
+    color: var(--background);
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 20px rgba(192,192,192,0.4);
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+.game-card {
+    background: rgba(0,0,0,0.8);
+    border: 1px solid var(--primary);
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--card-shadow);
+    position: relative;
+    backdrop-filter: blur(5px);
+}
+
+.game-card:hover {
+    border-color: var(--secondary);
+    box-shadow: 0 0 30px rgba(232,232,232,0.4),
+                0 0 60px rgba(232,232,232,0.3), 
+                0 0 90px rgba(232,232,232,0.2);
+    transform: translateY(-8px);
+    animation: cardGlow 1.5s infinite alternate;
+}
+
+@keyframes cardGlow {
+    from {
+        box-shadow: 0 0 30px rgba(192, 192, 192, 0.4),
+                    0 0 60px rgba(192, 192, 192, 0.3),
+                    0 0 90px rgba(192, 192, 192, 0.2);
+    }
+    to {
+        box-shadow: 0 0 50px rgba(192, 192, 192, 0.5),
+                    0 0 100px rgba(192, 192, 192, 0.4), 
+                    0 0 150px rgba(192, 192, 192, 0.3);
+    }
+}
+
+.game-thumbnail {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-bottom: 2px solid var(--primary);
+}
+
+.play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--primary);
+    box-shadow: 0 0 15px rgba(192,192,192,0.5);
+    color: var(--background);
+    padding: 1rem 2.5rem;
+    border-radius: 2rem;
+    font-weight: 700;
+    opacity: 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    z-index: 2;
+    text-shadow: 0 0 5px rgba(232,232,232,0.5);
+}
+
+.play-button:hover {
+    background: var(--secondary);
+}
+
+.game-card:hover .play-button {
+    opacity: 1;
+}
+
+.game-card:hover .game-thumbnail {
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    width: 90%;
+    height: 90%;
+    background: rgba(0,0,0,0.95);
+    border: 2px solid var(--primary);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(192,192,192,0.4),
+                0 0 60px rgba(192,192,192,0.3),
+                0 0 90px rgba(192,192,192,0.2),
+                0 0 120px rgba(192,192,192,0.1);
+    padding-bottom: 4rem; 
+    /* Enhanced glow animation */
+    animation: modalGlow 2s infinite alternate;
+}
+
+/* Enhanced glow animation */
+@keyframes modalGlow {
+    from {
+        box-shadow: 0 0 30px rgba(192, 192, 192, 0.4),
+                    0 0 60px rgba(192, 192, 192, 0.3),
+                    0 0 90px rgba(192, 192, 192, 0.2),
+                    0 0 120px rgba(192, 192, 192, 0.1);
+    }
+    to {
+        box-shadow: 0 0 50px rgba(192, 192, 192, 0.5),
+                    0 0 100px rgba(192, 192, 192, 0.4),
+                    0 0 150px rgba(192, 192, 192, 0.3),
+                    0 0 200px rgba(192, 192, 192, 0.2);
+    }
+}
+
+.close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--primary);
+    border: none;
+    color: var(--background);
+    font-size: 1.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.close-modal:hover {
+    background: var(--secondary);
+}
+
+.modal-game-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.modal-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.95);
+    padding: 0.75rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    border-top: 1px solid var(--primary);
+}
+
+.control-button {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.control-button:hover {
+    background: var(--primary);
+    color: var(--background);
+    box-shadow: 0 0 10px rgba(192,192,192,0.5);
+}
+
+.control-button i {
+    width: 1.5rem;
+    text-align: center;
+}
+
+.volume-slider {
+    width: 100px;
+    margin-left: 0.5rem;
+    accent-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .games-grid {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+    }
+    
+    header {
+        padding: 2rem 1rem;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+}
+
+.game-info {
+    padding: 1.5rem;
+    color: var(--text);
+}
+
+.game-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--primary);
+    text-shadow: 0 0 5px rgba(192, 192, 192, 0.3);
+}
+
+.game-description {
+    font-size: 0.9rem;
+    color: var(--text);
+    opacity: 0.9;
+    margin-bottom: 1rem;
+}
+
+.source-badge {
+    display: inline-block;
+    background: var(--primary);
+    color: var(--background);
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.loading-message {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: var(--primary);
+    text-shadow: 0 0 5px rgba(232,232,232,0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.poker-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.poker-elements {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.controller {
+    position: absolute;
+    opacity: 0;
+    animation: float 10s infinite ease-in-out;
+    font-size: 96px;
+    color: var(--primary);
+    text-shadow: 0 0 20px rgba(192,192,192,0.5);
+    filter: drop-shadow(0 0 10px rgba(192,192,192,0.3));
+}
+
+.card, .chip {
+    display: none;
+}
+
+@keyframes float {
+    0%, 100% { 
+        transform: translateY(0) rotate(0deg) scale(1); 
+        opacity: 0; 
+    }
+    10% { opacity: 0.7; }
+    50% { 
+        transform: translateY(-200px) rotate(180deg) scale(1.2);
+        opacity: 0.5;
+    }
+    90% { opacity: 0.7; }
+}
+
+h1 img {
+    filter: drop-shadow(0 0 10px rgba(192, 192, 192, 0.7)) 
+            drop-shadow(0 0 20px rgba(192, 192, 192, 0.4)) 
+            drop-shadow(0 0 30px rgba(192, 192, 192, 0.2));
+}
+</style>
+</head>
+<body>
+
+<div class="filter-bar">
+    <input type="text" id="searchInput" placeholder="Search games...">
+</div>
+
+<div class="games-grid" id="gamesContainer">
+</div>
+
+<div id="gameModal" class="modal">
+    <button class="close-modal" onclick="closeModal()">&#xd7;</button>
+    <div class="modal-content">
+        <iframe id="modalGameFrame" class="modal-game-frame" allowfullscreen></iframe>
+        <div class="modal-controls">
+            <button class="control-button" onclick="toggleVolume()">
+                <i class="fas fa-volume-up" id="volumeIcon"></i>
+                </button><input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100">
+            
+            <button class="control-button" onclick="toggleFullscreen()">
+                <i class="fas fa-expand"></i>
+            </button>
+            <button class="control-button" onclick="saveGameData()">
+                <i class="fas fa-save"></i>
+            </button>
+            <button class="control-button" onclick="restartGame()">
+                <i class="fas fa-redo"></i>
+            </button>
+            <button class="control-button" onclick="shareGame()">
+                <i class="fas fa-share-alt"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>const games = [{
+  title: "Cross-Kicks",
+  url: "https://html5.gamemonetize.co/qn5o1plhg4s7y6p9wsmspczthx00cgnz/",
+  thumbnail: "https://img.gamemonetize.com/qn5o1plhg4s7y6p9wsmspczthx00cgnz/512x340.jpg",
+  source: "",
+  description: "Save money on shoes solving puzzles"
+}, {
+  title: "Galactic Rhyme",
+  url: "https://html5.gamemonetize.co/m8f9aw7fb2q6y2p809hiptzxl8qf9ekv/",
+  thumbnail: "https://img.gamemonetize.com/m8f9aw7fb2q6y2p809hiptzxl8qf9ekv/512x340.jpg",
+  source: "",
+  description: "A fun simple vocabulary game for kids"
+}, {
+  title: "Endless Truck",
+  url: "https://play.famobi.com/wrapper/endless-truck/A1000-10",
+  thumbnail: "https://img.cdn.famobi.com/portal/html5games/images/tmp/EndlessTruckTeaser.jpg",
+  source: "Famobi",
+  description: "Drive your truck on endless roads"
+}, {
+  title: "Table Tennis World Tour",
+  url: "https://play.famobi.com/wrapper/table-tennis-world-tour/A1000-10",
+  thumbnail: "https://img.cdn.famobi.com/portal/html5games/images/tmp/TableTennisWorldTourTeaser.jpg",
+  source: "Famobi",
+  description: "Compete in the world tour of ping pong"
+}, {
+  title: "Garden Bloom",
+  url: "https://play.famobi.com/wrapper/garden-bloom/A1000-10",
+  thumbnail: "https://img.cdn.famobi.com/portal/html5games/images/tmp/GardenBloomTeaser.jpg",
+  source: "Famobi",
+  description: "Cultivate and take care of your magical garden"
+}, {
+  title: "Slope",
+  url: "https://play.famobi.com/wrapper/slope/A1000-10",
+  thumbnail: "https://img.cdn.famobi.com/portal/html5games/images/tmp/SlopeTeaser.jpg",
+  source: "Famobi",
+  description: "An exciting 3D speed game where you must maintain balance"
+}];
+function initPokerBackground() {
+  const pokerBackground = document.createElement('div');
+  pokerBackground.className = 'poker-background';
+  const pokerElements = document.createElement('div');
+  pokerElements.className = 'poker-elements';
+  const controllerIcons = ['fa-gamepad', 'fa-dice', 'fa-chess', 'fa-puzzle-piece', 'fa-headset', 'fa-trophy', 'fa-joystick', 'fa-coins'];
+  for (let i = 0; i < 15; i++) {
+    const controller = document.createElement('i');
+    controller.className = `controller fas ${controllerIcons[Math.floor(Math.random() * controllerIcons.length)]}`;
+    controller.style.top = `${Math.random() * 100}%`;
+    controller.style.left = `${Math.random() * 100}%`;
+    controller.style.animationDelay = `${Math.random() * 10}s`;
+    controller.style.transform = `rotate(${Math.random() * 360}deg)`;
+    pokerElements.appendChild(controller);
+  }
+  pokerBackground.appendChild(pokerElements);
+  document.body.insertBefore(pokerBackground, document.body.firstChild);
+}
+async function initializeGames() {
+  initPokerBackground();
+  const container = document.getElementById('gamesContainer');
+  renderGames(games);
+}
+function createGameCard(game) {
+  return `
+        <div class="game-card">
+            <img src="${game.thumbnail}" alt="${game.title} thumbnail" class="game-thumbnail">
+            <button class="play-button" onclick="openGame('${game.url}')">Play</button>
+            <div class="game-info">
+                <h3 class="game-title">${game.title}</h3>
+                <p class="game-description">${game.description}</p>
+                <span class="source-badge">${game.source}</span>
+            </div>
+        </div>
+    `;
+}
+function openGame(url) {
+  const modal = document.getElementById('gameModal');
+  const gameFrame = document.getElementById('modalGameFrame');
+  modal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  let loadingTimeout = setTimeout(() => {
+    const modalControls = document.querySelector('.modal-controls');
+    const loadingMsg = document.createElement('div');
+    loadingMsg.className = 'loading-message';
+    loadingMsg.innerHTML = `
+            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                If the game is taking too long to load, press the <i class="fas fa-redo"></i> button to reload
+            </div>
+        `;
+    modalControls.insertBefore(loadingMsg, modalControls.firstChild);
+  }, 10000);
+  gameFrame.onload = () => {
+    clearTimeout(loadingTimeout);
+    const loadingMsg = document.querySelector('.loading-message');
+    if (loadingMsg) loadingMsg.remove();
+  };
+  gameFrame.src = url;
+}
+function closeModal() {
+  const modal = document.getElementById('gameModal');
+  const gameFrame = document.getElementById('modalGameFrame');
+  modal.style.display = 'none';
+  gameFrame.src = '';
+  document.body.style.overflow = 'auto';
+}
+document.getElementById('searchInput').addEventListener('input', e => {
+  const searchTerm = e.target.value.toLowerCase();
+  const filteredGames = games.filter(game => game.title.toLowerCase().includes(searchTerm) || game.description.toLowerCase().includes(searchTerm));
+  renderGames(filteredGames);
+});
+function renderGames(gamesArray) {
+  const container = document.getElementById('gamesContainer');
+  container.innerHTML = gamesArray.map(game => createGameCard(game)).join('');
+}
+initializeGames();
+document.getElementById('gameModal').addEventListener('click', e => {
+  if (e.target.id === 'gameModal') {
+    closeModal();
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeModal();
+  }
+});
+function toggleVolume() {
+  const volumeIcon = document.getElementById('volumeIcon');
+  const volumeSlider = document.getElementById('volumeSlider');
+  if (volumeSlider.value > 0) {
+    volumeSlider.value = 0;
+    volumeIcon.className = 'fas fa-volume-mute';
+  } else {
+    volumeSlider.value = 100;
+    volumeIcon.className = 'fas fa-volume-up';
+  }
+  updateGameVolume(volumeSlider.value);
+}
+function updateGameVolume(value) {
+  const gameFrame = document.getElementById('modalGameFrame');
+  try {
+    gameFrame.contentWindow.postMessage({
+      type: 'setVolume',
+      volume: value / 100
+    }, '*');
+    gameFrame.contentWindow.postMessage({
+      action: 'volume',
+      value: value / 100
+    }, '*');
+    const gameAudio = gameFrame.contentWindow.document.getElementsByTagName('audio');
+    const gameVideo = gameFrame.contentWindow.document.getElementsByTagName('video');
+    [...gameAudio, ...gameVideo].forEach(media => {
+      media.volume = value / 100;
+    });
+  } catch (err) {
+    console.log('Volume adjustment attempt:', err);
+  }
+}
+function toggleFullscreen() {
+  const modalContent = document.querySelector('.modal-content');
+  if (!document.fullscreenElement) {
+    modalContent.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+function saveGameData() {
+  const gameFrame = document.getElementById('modalGameFrame');
+  if (gameFrame.contentWindow.postMessage) {
+    gameFrame.contentWindow.postMessage({
+      type: 'saveGame'
+    }, '*');
+  }
+}
+function restartGame() {
+  const gameFrame = document.getElementById('modalGameFrame');
+  gameFrame.src = gameFrame.src;
+}
+function shareGame() {
+  const gameFrame = document.getElementById('modalGameFrame');
+  if (navigator.share) {
+    navigator.share({
+      title: 'Check out this game!',
+      url: gameFrame.src
+    }).catch(err => {
+      copyToClipboard(gameFrame.src);
+    });
+  } else {
+    copyToClipboard(gameFrame.src);
+  }
+}
+function copyToClipboard(text) {
+  const input = document.createElement('input');
+  input.value = text;
+  document.body.appendChild(input);
+  input.select();
+  try {
+    document.execCommand('copy');
+    alert('Game link copied to clipboard!');
+  } catch (err) {
+    console.error('Failed to copy text: ', err);
+    alert('Could not share or copy game link');
+  }
+  document.body.removeChild(input);
+}
+document.getElementById('volumeSlider').addEventListener('input', e => {
+  const value = e.target.value;
+  const volumeIcon = document.getElementById('volumeIcon');
+  volumeIcon.className = value > 0 ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+  updateGameVolume(value);
+});
+window.addEventListener('message', event => {
+  if (event.data && event.data.type === 'volumeStatus') {
+    const volumeSlider = document.getElementById('volumeSlider');
+    const volumeIcon = document.getElementById('volumeIcon');
+    volumeSlider.value = event.data.volume * 100;
+    volumeIcon.className = event.data.volume > 0 ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+  }
+});</script>
+
+</body></html>

@@ -1,0 +1,1298 @@
+<html><head><base href="https://cyberforge.com/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cyberforge</title>
+<style>
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg-color);
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    .panel {
+        gap: 20px;
+        padding: 10px;
+        font-size: 1.5em;
+    }
+
+    .case {
+        width: 150px;
+        height: 225px;
+    }
+
+    #clock {
+        font-size: 1.5em;
+        padding: 8px 15px;
+    }
+
+    .settings-container {
+        padding: 10px;
+    }
+
+    .settings-option {
+        width: calc(50% - 20px);
+        min-width: 140px;
+        height: 200px;
+        font-size: 1.4em;
+    }
+
+    #navigation {
+        bottom: 10px;
+    }
+
+    .nav-btn {
+        padding: 8px 15px;
+        font-size: 1em;
+    }
+
+    #fullscreen-btn {
+        bottom: 10px;
+        right: 10px;
+        padding: 8px 15px;
+        font-size: 1em;
+    }
+
+    .theme-option {
+        padding: 15px;
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    .panel {
+        flex-direction: column;
+        gap: 15px;
+        font-size: 1.2em;
+    }
+
+    .case {
+        width: 130px;
+        height: 195px;
+    }
+
+    .settings-option {
+        width: 100%;
+        height: 180px;
+        font-size: 1.2em;
+    }
+
+    #clock {
+        font-size: 1.2em;
+        top: 10px;
+        right: 10px;
+    }
+
+    .settings-back {
+        font-size: 1em;
+        padding: 8px 15px;
+    }
+}
+
+@media (hover: none) {
+    .case:active {
+        transform: scale(1.1) rotateY(var(--rotation, 0deg)) !important;
+        box-shadow: 0 0 20px 5px var(--hover-glow),
+                    0 0 30px 10px rgba(16, 124, 16, 0.3),
+                    0 0 40px 15px rgba(16, 124, 16, 0.2);
+        border-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .settings-option:active {
+        transform: scale(1.1);
+        box-shadow: 0 0 20px 5px var(--hover-glow),
+                    0 0 30px 10px rgba(16, 124, 16, 0.3),
+                    0 0 40px 15px rgba(16, 124, 16, 0.2);
+        border-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .nav-btn:active,
+    .settings-back:active,
+    #fullscreen-btn:active {
+        background: rgba(255, 255, 255, 0.4);
+    }
+}
+
+:root {
+    --bg-color: #107c10;
+    --accent-color: rgba(255, 255, 255, 0.1);
+    --text-color: white;
+    --border-color: rgba(255, 255, 255, 0.3);
+    --hover-glow: rgba(255, 255, 255, 0.5);
+}
+
+.theme-default {
+    --bg-color: #107c10;
+    --accent-color: rgba(255, 255, 255, 0.1);
+    --text-color: white;
+    --border-color: rgba(255, 255, 255, 0.3);
+    --hover-glow: rgba(255, 255, 255, 0.5);
+}
+
+.theme-cyberpunk {
+    --bg-color: #0a1128;
+    --accent-color: rgba(0, 255, 255, 0.1); 
+    --text-color: #00fff0;
+    --border-color: rgba(0, 255, 255, 0.3);
+    --hover-glow: rgba(0, 255, 255, 0.5);
+}
+
+.theme-halloween {
+    --bg-color: #1a0f2e;
+    --accent-color: rgba(255, 165, 0, 0.1);
+    --text-color: #ff6b00;
+    --border-color: rgba(255, 165, 0, 0.3);
+    --hover-glow: rgba(255, 165, 0, 0.5);
+}
+
+.theme-christmas {
+    --bg-color: #1e4d2b;
+    --accent-color: rgba(255, 0, 0, 0.1);
+    --text-color: #ffffff;
+    --border-color: rgba(255, 0, 0, 0.3);
+    --hover-glow: rgba(255, 0, 0, 0.5);
+}
+
+.theme-neon-nightscape {
+    --bg-color: #0a0a2a;
+    --accent-color: rgba(255, 0, 255, 0.1);
+    --text-color: #ff00ff;
+    --border-color: rgba(255, 0, 255, 0.3);
+    --hover-glow: rgba(255, 0, 255, 0.5);
+}
+
+.theme-neon-nightscape .brand-text {
+    animation: neonFlicker 2s infinite, colorShift 5s infinite;
+}
+
+.theme-neon-nightscape .top-banner {
+    border-bottom: 2px solid var(--border-color);
+    box-shadow: 0 0 10px var(--hover-glow);
+}
+
+.top-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    z-index: 999;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.brand-text {
+    color: var(--text-color);
+    font-size: 2em;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.animated-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.bg-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: float 20s infinite linear;
+    opacity: 0.5;
+}
+
+@keyframes float {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+    25% {
+        transform: translate(100px, 50px) scale(1.1);
+    }
+    50% {
+        transform: translate(50px, 100px) scale(1);
+    }
+    75% {
+        transform: translate(-50px, 50px) scale(0.9);
+    }
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+}
+
+@keyframes neonFlicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        opacity: 1;
+        text-shadow: 0 0 10px var(--text-color),
+                     0 0 20px var(--text-color),
+                     0 0 30px var(--text-color);
+    }
+    20%, 22%, 24%, 55% {
+        opacity: 0.5;
+        text-shadow: none;
+    }
+}
+
+@keyframes glitch {
+    0% {
+        transform: translate(0);
+    }
+    20% {
+        transform: translate(-2px, 2px);
+    }
+    40% {
+        transform: translate(-2px, -2px);
+    }
+    60% {
+        transform: translate(2px, 2px);
+    }
+    80% {
+        transform: translate(2px, -2px);
+    }
+    100% {
+        transform: translate(0);
+    }
+}
+
+@keyframes colorShift {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+    50% {
+        filter: hue-rotate(10deg);
+    }
+    100% {
+        filter: hue-rotate(0deg);
+    }
+}
+
+.theme-neon-nightscape .case,
+.theme-neon-nightscape .settings-option {
+    border: 2px solid var(--border-color);
+    box-shadow: 0 0 10px var(--hover-glow),
+                inset 0 0 10px var(--hover-glow);
+    animation: neonFlicker 2s infinite, colorShift 5s infinite;
+}
+
+.theme-neon-nightscape .case:hover,
+.theme-neon-nightscape .settings-option:hover {
+    animation: neonFlicker 1s infinite, glitch 0.2s infinite, colorShift 5s infinite;
+}
+
+.theme-neon-nightscape .nav-btn,
+.theme-neon-nightscape .settings-back,
+.theme-neon-nightscape #fullscreen-btn {
+    border: 1px solid var(--border-color);
+    box-shadow: 0 0 5px var(--hover-glow);
+    animation: neonFlicker 3s infinite;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg-color);
+}
+#container {
+    width: 100%;
+    height: 100%;
+    perspective: 1000px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#dashboard {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+}
+.panel {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    padding: 20px;
+    font-size: 2em;
+    color: var(--text-color);
+    background: var(--bg-color);
+    backface-visibility: hidden;
+}
+.case {
+    width: 200px;
+    height: 300px;
+    background: var(--accent-color);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+}
+.case:hover {
+    transform: scale(1.1) rotateY(var(--rotation, 0deg)) !important;
+    box-shadow: 0 0 20px 5px var(--hover-glow),
+                0 0 30px 10px rgba(16, 124, 16, 0.3),
+                0 0 40px 15px rgba(16, 124, 16, 0.2);
+    border-color: rgba(255, 255, 255, 0.8);
+}
+.case-front, .case-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em;
+    text-align: center;
+    padding: 10px;
+    box-sizing: border-box;
+    gap: 15px;
+}
+.case-back {
+    transform: rotateY(180deg);
+    background: rgba(0, 0, 0, 0.8);
+}
+.case-icon {
+    width: 48px;
+    height: 48px;
+    fill: currentColor;
+    opacity: 0.9;
+}
+.case:hover .case-icon {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+}
+#navigation {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    z-index: 1000;
+}
+.nav-btn {
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 5px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background 0.3s;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+#fullscreen-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 5px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    font-size: 1.1em;
+    font-weight: bold;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+#fullscreen-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+}
+#fullscreen-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+#clock {
+    position: static !important;
+    margin: 0 !important;
+    color: var(--text-color);
+    font-size: 2em;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    background: transparent;
+    padding: 10px 20px;
+    border-radius: 10px;
+}
+.settings-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-color);
+    display: none;
+    justify-content: center;
+    align-items: start;
+    z-index: 1001;
+    backdrop-filter: blur(10px);
+    overflow-y: auto;
+    padding: 60px 0;
+}
+.games-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-color);
+    display: none;
+    justify-content: center;
+    align-items: start;
+    z-index: 1001;
+    backdrop-filter: blur(10px);
+    overflow-y: auto;
+    padding: 60px 0;
+}
+.store-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-color);
+    display: none;
+    justify-content: center;
+    align-items: start;
+    z-index: 1001;
+    backdrop-filter: blur(10px);
+    overflow-y: auto;
+    padding: 60px 0;
+}
+.media-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-color);
+    display: none;
+    justify-content: center;
+    align-items: start;
+    z-index: 1001;
+    backdrop-filter: blur(10px);
+    overflow-y: auto;
+    padding: 60px 0;
+}
+.settings-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 90vw;
+    padding: 20px;
+}
+.settings-option {
+    width: calc(33.33% - 20px);
+    min-width: 250px;
+    max-width: 300px;
+    height: 300px;
+    margin: 10px;
+    background: var(--accent-color);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.8em;
+    color: var(--text-color);
+    text-align: center;
+    padding: 15px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+.settings-option:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px 5px var(--hover-glow),
+                0 0 30px 10px rgba(16, 124, 16, 0.3),
+                0 0 40px 15px rgba(16, 124, 16, 0.2);
+    border-color: rgba(255, 255, 255, 0.8);
+}
+.settings-option .case-icon {
+    width: 64px;
+    height: 64px;
+    fill: currentColor;
+    opacity: 0.9;
+    margin-bottom: 15px;
+}
+.settings-option:hover .case-icon {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+}
+.settings-back {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 5px;
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 1.1em;
+    z-index: 1002;
+}
+.settings-back:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+.theme-option {
+    background: var(--accent-color);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.theme-option:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px var(--hover-glow);
+}
+</style>
+</head>
+<body>
+<div class="top-banner">
+    <div class="brand-text">Cyberforge</div>
+    <div id="clock"></div>
+</div>
+<div class="animated-bg">
+    <div class="bg-circle" style="width: 300px; height: 300px; top: 10%; left: 10%; animation-delay: 0s;"></div>
+    <div class="bg-circle" style="width: 200px; height: 200px; top: 40%; left: 60%; animation-delay: -5s;"></div>
+    <div class="bg-circle" style="width: 400px; height: 400px; top: 60%; left: 20%; animation-delay: -10s;"></div>
+    <div class="bg-circle" style="width: 250px; height: 250px; top: 20%; left: 80%; animation-delay: -15s;"></div>
+</div>
+<div id="container">
+    <div id="dashboard">
+        <div class="panel" style="transform: rotateY(0deg) translateZ(500px);">
+            <div class="case" onclick="rotateCase(this)">
+                <div class="case-front">
+                    <svg class="case-icon" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                    Games
+                </div>
+                <div class="case-back">Popular: Halo 3</div>
+            </div>
+            <div class="case" onclick="rotateCase(this)">
+                <div class="case-front">
+                    <svg class="case-icon" viewBox="0 0 24 24"><path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg>
+                    Media
+                </div>
+                <div class="case-back">Watch shows</div>
+            </div>
+            <div class="case" onclick="rotateCase(this)">
+                <div class="case-front">
+                    <svg class="case-icon" viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+                    Settings
+                </div>
+                <div class="case-back">Configure Xbox</div>
+            </div>
+        </div>
+        <div class="panel" style="transform: rotateY(90deg) translateZ(500px);">
+            <div class="case" onclick="rotateCase(this)">
+                <div class="case-front">
+                    <svg class="case-icon" viewBox="0 0 24 24"><path d="M16.5,6.5C16.5,8.43,14.93,10,13,10s-3.5-1.57-3.5-3.5S11.07,3,13,3S16.5,4.57,16.5,6.5z M9,13c-2.33,0-7,1.17-7,3.5V19h14v-2.5C16,14.17,11.33,13,9,13z M16.5,14.5c0-0.01,0-0.01,0-0.02c-0.06,0.02-0.11,0.04-0.17,0.06c0.06-0.02,0.12-0.04,0.17-0.06c0,0.01,0,0.01,0,0.02c0.01,0.21,0.02,0.43,0.02,0.65V17h4v-1.5C20.5,15.17,18.33,14.5,16.5,14.5z M15,12c1.93,0,3.5-1.57,3.5-3.5S16.93,5,15,5c-0.54,0-1.04,0.13-1.5,0.35c0.63,0.89,1,1.98,1,3.15s-0.37,2.26-1,3.15C13.96,11.87,14.46,12,15,12z"/></svg>
+                    Friends
+                </div>
+                <div class="case-back">Online: 5</div>
+            </div>
+            <div class="case" onclick="rotateCase(this)">
+                <div class="case-front">
+                    <svg class="case-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+                    Messages
+                </div>
+                <div class="case-back">New: 2</div>
+            </div>
+            <div class="case" onclick="rotateCase(this)">
+                <div class="case-front">
+                    <svg class="case-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    Profile
+                </div>
+                <div class="case-back">View Stats</div>
+            </div>
+        </div>
+        <div class="panel" style="transform: rotateY(180deg) translateZ(500px);">
+            <div class="case" onclick="rotateCase(this)">
+                <div class="case-front">
+                    <svg class="case-icon" viewBox="0 0 24 24">
+                        <path d="M20.2,2H3.8C2.8,2,2,2.8,2,3.8v16.4C2,21.2,2.8,22,3.8,22h16.4c1,0,1.8-0.8,1.8-1.8V3.8C22,2.8,21.2,2,20.2,2z M12,19 c-1.7,0-3-1.3-3-3s1.3-3,3-3s3,1.3,3,3S13.7,19,12,19z M15,9h-2V7h-2v2H9v2h2v2h2v-2h2V9z"/>
+                    </svg>
+                    Achievements
+                </div>
+                <div class="case-back">Gamerscore: 10,000</div>
+            </div>
+            <div class="case" onclick="rotateCase(this)">
+                <div class="case-front">
+                    <svg class="case-icon" viewBox="0 0 24 24"><path d="M9 3v2h6V3h-6zm0 4v2h6V7h-6zm0 4v2h6v-2h-6zM5 3v2h2V3H5zm-2 3v2h2V6H3zm0 4v2h2v-2H3zm14-1h2v-2h-2v2zM5 17H3v2h2v-2zm18 0h-2v2h2v-2zm-2-10h2V3h-2v2zM5 17H3v2h2v-2zm18 0h-2v2h2v-2zm2-10h-2V3h-2v2z"/></svg>
+                    Store
+                </div>
+                <div class="case-back">New releases</div>
+            </div>
+            <div class="case" onclick="rotateCase(this)">
+                <div class="case-front">
+                    <svg class="case-icon" viewBox="0 0 24 24"><path d="M20 6h-6V4H6v16h8v-2H8V6h12v2h2V6z"/></svg>
+                    Downloads
+                </div>
+                <div class="case-back">Active: 2</div>
+            </div>
+        </div>
+        <div class="panel" style="transform: rotateY(270deg) translateZ(500px);">
+            <div class="case" onclick="rotateCase(this)">
+                <div class="case-front">
+                    <svg class="case-icon" viewBox="0 0 24 24"><path d="M16 4h-3V2h-2v2H8v2h8V4zm3 4h-2v12H5V8H3v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8h-2V8z"/></svg>
+                    Web
+                </div>
+                <div class="case-back">Gold membership</div>
+            </div>
+            <div class="case" onclick="rotateCase(this)">
+                <div class="case-front">
+                    <svg class="case-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10c0-5.52-4.48-10-10-10zm1 16v-2H11v2h2zm-2-4v-2h4v2h-4zm0-4v-2h4v2h-4z"/></svg>
+                    Community
+                </div>
+                <div class="case-back">Latest Activity</div>
+            </div>
+            <div class="case" onclick="rotateCase(this)">
+                <div class="case-front">
+                    <svg class="case-icon" viewBox="0 0 24 24"><path d="M12 3v2h7v7h2V3h-9zm0 16v-2h7v-7h2v9c0 1.1-.9 2-2 2h-7zM4 3v7h2V5h7V3H4zm0 10v7h7v2H2c-1.1 0-2-.9-2-2v-7h2z"/></svg>
+                    Help
+                </div>
+                <div class="case-back">Support</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="media-panel">
+    <button class="settings-back" onclick="closeMedia()">← Back</button>
+    <div class="settings-container">
+        <div class="settings-option" onclick="selectMedia('music')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+            </svg>
+            Music
+        </div>
+        <div class="settings-option" onclick="selectMedia('pictures')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+            </svg>
+            Pictures
+        </div>
+        <div class="settings-option" onclick="selectMedia('videos')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+            </svg>
+            Videos
+        </div>
+    </div>
+</div>
+<div class="settings-panel">
+    <button class="settings-back" onclick="closeSettings()">← Back</button>
+    <div class="settings-container">
+        <div class="settings-option" onclick="selectSettingsOption('account')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            Account
+        </div>
+        <div class="settings-option" onclick="selectSettingsOption('audio')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            </svg>
+            Audio
+        </div>
+        <div class="settings-option" onclick="selectSettingsOption('controller')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+            </svg>
+            Controller
+        </div>
+        <div class="settings-option" onclick="selectSettingsOption('display')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM4 6h16v12H4z"/>
+            </svg>
+            Display
+        </div>
+        <div class="settings-option" onclick="selectSettingsOption('themes')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+            </svg>
+            Themes
+        </div>
+    </div>
+</div>
+<div class="games-panel">
+    <button class="settings-back" onclick="closeGames()">← Back</button>
+    <div class="settings-container">
+        <div class="settings-option" onclick="selectGame('cosmosrising')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
+            </svg>
+            Cosmos Rising
+        </div>
+        <div class="settings-option" onclick="selectGame('crosskicks')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+            </svg>
+            Cross-Kicks
+        </div>
+        <div class="settings-option" onclick="selectGame('galacticrhyme')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+            </svg>
+            Galactic Rhyme
+        </div>
+        <div class="settings-option" onclick="selectGame('score')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
+            </svg>
+            $core
+        </div>
+        <div class="settings-option" onclick="selectGame('superstarmcclain')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+            </svg>
+            Superstar McClain
+        </div>
+    </div>
+</div>
+<div class="store-panel">
+    <button class="settings-back" onclick="closeStore()">← Back</button>
+    <div class="settings-container">
+        <div class="settings-option" onclick="selectStore('5ps')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M21.5,2h-19C1.67,2,1,2.67,1,3.5v17C1,21.33,1.67,22,2.5,22h19c0.83,0,1.5-0.67,1.5-1.5v-17C23,2.67,22.33,2,21.5,2z M21,20H3V4h18V20z M7.5,12c0.83,0,1.5-0.67,1.5-1.5S8.33,9,7.5,9S6,9.67,6,10.5S6.67,12,7.5,12z M16.5,12c0.83,0,1.5-0.67,1.5-1.5S17.33,9,16.5,9S15,9.67,15,10.5S15.67,12,16.5,12z"/>
+            </svg>
+            5Ps Footwear
+        </div>
+        <div class="settings-option" onclick="selectStore('steelwear')">
+            <svg class="case-icon" viewBox="0 0 24 24">
+                <path d="M16,21h-2v-2h2V21z M8,21H6v-2h2V21z M16,17h-2v-2h2V17z M8,17H6v-2h2V17z M16,13h-2v-2h2V13z M8,13H6v-2h2V13z M16,9h-2V7h2V9z M8,9H6V7h2V9z M16,5h-2V3h2V5z M8,5H6V3h2V5z"/>
+            </svg>
+            Steel Wear
+        </div>
+    </div>
+</div>
+<div id="navigation">
+    <button class="nav-btn" onclick="rotateDashboard('left')">Left</button>
+    <button class="nav-btn" onclick="rotateDashboard('right')">Right</button>
+</div>
+
+<button id="fullscreen-btn">
+    <svg viewBox="0 0 24 24" class="fullscreen-icon">
+        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+    </svg>
+    <span>Fullscreen</span>
+</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+<script>
+let currentRotation = 0;
+
+const sounds = {
+    navigate: new Howl({
+        src: ['https://assets.xbox360simulator.com/sounds/navigate.mp3']
+    }),
+    select: new Howl({
+        src: ['https://assets.xbox360simulator.com/sounds/select.mp3']
+    })
+};
+
+function rotateDashboard(direction) {
+    sounds.navigate.play();
+    const dashboard = document.getElementById('dashboard');
+    const now = Date.now();
+    if (now - lastRotateTime >= rotateThrottleDelay) {
+        if (direction === 'left') {
+            currentRotation -= 90;
+        } else {
+            currentRotation += 90;
+        }
+        dashboard.style.transform = `rotateY(${currentRotation}deg)`;
+        lastRotateTime = now;
+    }
+}
+
+function rotateCase(caseElement) {
+    sounds.select.play();
+    const frontText = caseElement.querySelector('.case-front').textContent.trim();
+    if (frontText === 'Settings') {
+        showSettings();
+        return;
+    } else if (frontText === 'Games') {
+        showGames();
+        return;
+    } else if (frontText === 'Store') {
+        showStore();
+        return;
+    } else if (frontText === 'Media') {
+        showMedia();
+        return;
+    }
+    const rotation = caseElement.style.transform === 'rotateY(180deg)' ? '0' : '180';
+    caseElement.style.setProperty('--rotation', rotation + 'deg');
+    caseElement.style.transform = `rotateY(${rotation}deg)`;
+}
+
+function showSettings() {
+    sounds.select.play();
+    document.querySelector('.settings-panel').style.display = 'flex';
+}
+
+function closeSettings() {
+    sounds.navigate.play();
+    document.querySelector('.settings-panel').style.display = 'none';
+}
+
+function selectSettingsOption(option) {
+    sounds.select.play();
+    if (option === 'themes') {
+        showThemes();
+    } else {
+        console.log('Selected settings option:', option);
+    }
+}
+
+function showThemes() {
+    const themeContainer = document.createElement('div');
+    themeContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--bg-color);
+        display: flex;
+        flex-direction: column;
+        z-index: 1003;
+    `;
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = `
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 1004;
+    `;
+
+    const backButton = document.createElement('button');
+    backButton.className = 'settings-back';
+    backButton.innerHTML = '← Back';
+    backButton.onclick = () => {
+        themeContainer.remove();
+        sounds.navigate.play();
+    };
+
+    const themesGrid = document.createElement('div');
+    themesGrid.style.cssText = `
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 80px 20px 20px 20px;
+        overflow-y: auto;
+    `;
+
+    const themes = [
+        { name: 'Default Green', class: 'theme-default' },
+        { name: 'Cyberpunk', class: 'theme-cyberpunk' },
+        { name: 'Halloween', class: 'theme-halloween' },
+        { name: 'Christmas', class: 'theme-christmas' },
+        { name: 'Neon Nightscape', class: 'theme-neon-nightscape' }
+    ];
+
+    themes.forEach(theme => {
+        const themeOption = document.createElement('div');
+        themeOption.className = 'theme-option ' + theme.class;
+        themeOption.innerHTML = theme.name;
+        themeOption.onclick = () => setTheme(theme.class);
+        themesGrid.appendChild(themeOption);
+    });
+
+    buttonContainer.appendChild(backButton);
+    themeContainer.appendChild(buttonContainer);
+    themeContainer.appendChild(themesGrid);
+    document.body.appendChild(themeContainer);
+}
+
+function setTheme(themeClass) {
+    document.body.className = themeClass;
+    localStorage.setItem('xbox360theme', themeClass);
+    sounds.select.play();
+}
+
+function showGames() {
+    sounds.select.play();
+    document.querySelector('.games-panel').style.display = 'flex';
+}
+
+function closeGames() {
+    sounds.navigate.play();
+    document.querySelector('.games-panel').style.display = 'none';
+}
+
+function showStore() {
+    sounds.select.play();
+    document.querySelector('.store-panel').style.display = 'flex';
+}
+
+function closeStore() {
+    sounds.navigate.play();
+    document.querySelector('.store-panel').style.display = 'none';
+}
+
+function showMedia() {
+    sounds.select.play();
+    document.querySelector('.media-panel').style.display = 'flex';
+}
+
+function closeMedia() {
+    sounds.navigate.play();
+    document.querySelector('.media-panel').style.display = 'none';
+}
+
+function selectMedia(option) {
+    sounds.select.play();
+    console.log('Selected media option:', option);
+}
+
+function selectStore(store) {
+    sounds.select.play();
+    if (store === 'steelwear') {
+        const storeContainer = document.createElement('div');
+        storeContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1002;
+            overflow: hidden;
+        `;
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.cssText = `
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1003;
+        `;
+
+        const backButton = document.createElement('button');
+        backButton.className = 'settings-back';
+        backButton.innerHTML = '← Back';
+        backButton.onclick = () => {
+            storeContainer.remove();
+            sounds.navigate.play();
+        };
+
+        const storeFrame = document.createElement('iframe');
+        storeFrame.src = 'https://www.steelcyclonestudios.com/steelwear.html#!/';
+        storeFrame.style.cssText = `
+            width: 100%;
+            height: calc(100% - 80px);
+            border: none;
+            margin-top: 60px;
+            overflow: auto;
+        `;
+        storeFrame.scrolling = 'yes';
+        storeFrame.frameBorder = '0';
+
+        buttonContainer.appendChild(backButton);
+        storeContainer.appendChild(buttonContainer);
+        storeContainer.appendChild(storeFrame);
+        document.body.appendChild(storeContainer);
+
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    } else if (store === '5ps') {
+        window.open('https://www.aliveshoes.com/brand/5ps', '_blank');
+    }
+}
+
+function selectGame(game) {
+    sounds.select.play();
+    if (game === 'galacticrhyme' || game === 'crosskicks') {
+        const gameContainer = document.createElement('div');
+        gameContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1002;
+        `;
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.cssText = `
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1003;
+        `;
+
+        const backButton = document.createElement('button');
+        backButton.className = 'settings-back';
+        backButton.innerHTML = '← Back';
+        backButton.onclick = () => {
+            gameContainer.remove();
+            sounds.navigate.play();
+        };
+
+        const gameFrame = document.createElement('iframe');
+        gameFrame.src = game === 'galacticrhyme' ? 'https://html5.gamemonetize.co/m8f9aw7fb2q6y2p809hiptzxl8qf9ekv/' : 'https://html5.gamemonetize.co/qn5o1plhg4s7y6p9wsmspczthx00cgnz/';
+        gameFrame.style.cssText = `
+            width: 100%;
+            height: calc(100% - 80px);
+            border: none;
+            margin-top: 60px;
+        `;
+        gameFrame.scrolling = 'no';
+        gameFrame.frameBorder = '0';
+
+        buttonContainer.appendChild(backButton);
+        gameContainer.appendChild(buttonContainer);
+        gameContainer.appendChild(gameFrame);
+        document.body.appendChild(gameContainer);
+
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    } else {
+        console.log('Selected game:', game);
+    }
+}
+
+document.addEventListener('keydown', (event) => {
+    switch(event.key) {
+        case 'ArrowLeft':
+            rotateDashboard('left');
+            break;
+        case 'ArrowRight':
+            rotateDashboard('right');
+            break;
+        case 'Enter':
+            const focusedCase = document.querySelector('.case:hover');
+            if (focusedCase) {
+                rotateCase(focusedCase);
+            }
+            break;
+        case 'f':
+        case 'F':
+            toggleFullScreen();
+            break;
+    }
+});
+
+// Add gamepad support
+let gamepadConnected = false;
+let lastButtonState = {};
+
+// Gamepad connection handlers
+window.addEventListener("gamepadconnected", (e) => {
+    console.log("Gamepad connected:", e.gamepad);
+    gamepadConnected = true;
+    requestAnimationFrame(updateGamepad);
+});
+
+window.addEventListener("gamepaddisconnected", (e) => {
+    console.log("Gamepad disconnected:", e.gamepad);
+    gamepadConnected = false;
+});
+
+function updateGamepad() {
+    if (!gamepadConnected) return;
+
+    const gamepad = navigator.getGamepads()[0];
+    if (!gamepad) return;
+
+    // Left thumbstick movement
+    const deadzone = 0.15;
+    const leftStickX = gamepad.axes[0];
+
+    if (Math.abs(leftStickX) > deadzone) {
+        if (leftStickX < -deadzone) {
+            rotateDashboard('left');
+        } else if (leftStickX > deadzone) {
+            rotateDashboard('right');
+        }
+    }
+
+    // A Button (index 0) - Select
+    if (gamepad.buttons[0].pressed && !lastButtonState[0]) {
+        const focusedCase = document.querySelector('.case:hover');
+        if (focusedCase) {
+            rotateCase(focusedCase);
+        }
+    }
+    lastButtonState[0] = gamepad.buttons[0].pressed;
+
+    // B Button (index 1) - Back
+    if (gamepad.buttons[1].pressed && !lastButtonState[1]) {
+        if (document.querySelector('.settings-panel').style.display === 'flex') {
+            closeSettings();
+        } else if (document.querySelector('.games-panel').style.display === 'flex') {
+            closeGames();
+        } else if (document.querySelector('.store-panel').style.display === 'flex') {
+            closeStore();
+        } else if (document.querySelector('.media-panel').style.display === 'flex') {
+            closeMedia();
+        }
+
+        const backButton = document.querySelector('.settings-back:not([style*="display: none"])');
+        if (backButton) {
+            backButton.click();
+        }
+    }
+    lastButtonState[1] = gamepad.buttons[1].pressed;
+
+    requestAnimationFrame(updateGamepad);
+}
+
+// Throttle dashboard rotation
+let lastRotateTime = 0;
+const rotateThrottleDelay = 250; // ms between allowed rotations
+
+const originalRotateDashboard = rotateDashboard;
+rotateDashboard = function(direction) {
+    const now = Date.now();
+    if (now - lastRotateTime >= rotateThrottleDelay) {
+        originalRotateDashboard(direction);
+        lastRotateTime = now;
+    }
+};
+
+// Add subtle movement to background circles on mouse move
+document.addEventListener('mousemove', (e) => {
+    const circles = document.querySelectorAll('.bg-circle');
+    const mouseX = e.clientX / window.innerWidth;
+    const mouseY = e.clientY / window.innerHeight;
+    
+    circles.forEach((circle, index) => {
+        const offsetX = (mouseX - 0.5) * (20 + index * 5);
+        const offsetY = (mouseY - 0.5) * (20 + index * 5);
+        circle.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    });
+});
+
+const fullscreenBtn = document.getElementById('fullscreen-btn');
+
+function toggleFullScreen() {
+    sounds.select.play();
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+document.addEventListener('fullscreenchange', () => {
+    const icon = fullscreenBtn.querySelector('svg');
+    if (document.fullscreenElement) {
+        icon.innerHTML = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
+        fullscreenBtn.querySelector('span').textContent = 'Exit Fullscreen';
+    } else {
+        icon.innerHTML = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
+        fullscreenBtn.querySelector('span').textContent = 'Fullscreen';
+    }
+});
+
+fullscreenBtn.addEventListener('click', toggleFullScreen);
+
+// Add touch event support for rotating dashboard
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+});
+
+document.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+});
+
+function handleSwipe() {
+    const swipeThreshold = 50; // minimum distance for swipe
+    const difference = touchEndX - touchStartX;
+    
+    if (Math.abs(difference) > swipeThreshold) {
+        if (difference > 0) {
+            rotateDashboard('right');
+        } else {
+            rotateDashboard('left');
+        }
+    }
+}
+
+// Add clock functionality
+function updateClock() {
+    const clock = document.getElementById('clock');
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    hours = hours % 12;
+    hours = hours ? hours : 12; // Convert 0 to 12
+    hours = hours.toString().padStart(2, '0');
+    
+    clock.textContent = `${hours}:${minutes} ${ampm}`;
+}
+
+// Update clock immediately and then every minute
+updateClock();
+setInterval(updateClock, 60000);
+
+// Add to the end of your script to persist theme:
+const savedTheme = localStorage.getItem('xbox360theme');
+if (savedTheme) {
+    document.body.className = savedTheme;
+}
+</script>
+</body>
+</html>

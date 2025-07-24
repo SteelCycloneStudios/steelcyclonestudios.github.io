@@ -1,0 +1,2184 @@
+<html><head><base href="https://yourapp.com/">
+<title>App Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+<style>
+/* Base styles */
+:root {
+  --primary-color: #ff6b6b;
+  --secondary-color: #4ecdc4;
+  --bg-color: #f8f9fa;
+  --text-color: #333;
+  --header-bg: #222;
+  --card-bg: white;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-color);
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  background: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: max-width 0.3s ease;
+}
+
+.app.desktop-view {
+  max-width: 1024px;
+}
+
+.header {
+  background: var(--header-bg);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  position: relative;
+}
+
+.mobile-menu-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  cursor: pointer;
+  z-index: 100;
+}
+
+.side-menu {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  height: 100vh;
+  width: 280px;
+  background: white;
+  z-index: 1000;
+  transition: left 0.3s ease;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+}
+
+.side-menu.active {
+  left: 0;
+}
+
+.side-menu-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-header {
+  padding: 20px;
+  background: var(--header-bg);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-menu {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.menu-items {
+  padding: 20px 0;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  color: #333;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+.menu-item:hover {
+  background: #f5f5f5;
+}
+
+.menu-item svg {
+  stroke: #666;
+}
+
+.nav-tabs {
+  display: flex;
+  background: #333;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.nav-tab {
+  flex: 1;
+  padding: 1rem;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.3s;
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+.nav-tab.active {
+  background: #444;
+  border-bottom: 3px solid var(--primary-color);
+}
+
+.workout-card {
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+  background: white;
+  margin-bottom: 20px;
+  padding: 20px;
+}
+
+.workout-card:hover {
+  transform: translateY(-5px);
+}
+
+.exercise-item {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+}
+
+.progress-circle {
+  width: 40px;
+  height: 40px;
+  margin-right: 15px;
+}
+
+.video-container {
+  display: none;
+  margin-top: 10px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.button-group {
+  display: flex;
+  gap: 5px;
+}
+
+.book-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.book-btn:hover {
+  background: #ff5252;
+}
+
+.book-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notification {
+  padding: 1rem;
+  background: #f8d7da;
+  color: #721c24;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.tab-content {
+  display: none; 
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.workout-complete {
+  display: none;
+  text-align: center;
+  padding: 30px;
+}
+
+.demo-btn {
+  background: #4ecdc4;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-right: 5px;
+}
+
+.demo-btn:hover {
+  background: #45b7ae;
+}
+
+.footer {
+  text-align: center;
+  padding: 20px;
+  background: var(--header-bg);
+  color: white;
+  margin-top: auto;
+  font-size: 0.9rem;
+}
+
+.view-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: var(--header-bg);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  transition: transform 0.3s;
+}
+
+.view-toggle:hover {
+  transform: scale(1.1);
+}
+
+.view-toggle svg {
+  color: white;
+  width: 24px;
+  height: 24px;
+}
+
+/* Additional styles */
+.hero {
+  position: relative;
+  height: 500px;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  background-size: cover;
+  background-position: center;
+}
+
+.slide.active {
+  opacity: 1;
+}
+
+.slider-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 2;
+}
+
+.slider-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  border: none;
+}
+
+.slider-dot.active {
+  background: white;
+}
+
+.categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+}
+
+.category-card {
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+}
+
+.category-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.category-info {
+  padding: 1rem;
+  text-align: center;
+}
+
+.product-slider {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.product-card {
+  flex: 0 0 250px;
+  scroll-snap-align: start;
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.product-info {
+  padding: 1rem;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.product-price {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.basic-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+  margin-top: 2rem; /* Add margin to separate from other sections */
+}
+
+.basic-products .product-card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.basic-products .product-image {
+  width: 100%;
+  height: 300px; /* Fixed height for consistency */
+  object-fit: contain; /* Changed to contain to prevent cropping */
+  background: #f8f9fa; /* Light background for image container */
+  padding: 1rem;
+}
+
+.basic-products .product-info {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+.basic-products .product-name {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.basic-products .product-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+/* Accessory styles */
+.accessories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.accessory-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.accessory-card:hover {
+  transform: translateY(-5px);
+}
+
+.accessory-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+
+.accessory-info {
+  padding: 1.5rem;
+}
+
+.accessory-name {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.accessory-description {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.accessory-price {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+/* Hero content styles */
+.hero-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 2rem;
+  border-radius: 10px;
+}
+
+.hero-content h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero-content p {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+.cta-button:hover {
+  background: #ff5252;
+  color: white;
+  text-decoration: none;
+}
+
+/* FAQ styles */
+.faq-section {
+  padding: 2rem;
+  background: #f8f9fa;
+}
+
+.accordion-item {
+  margin-bottom: 1rem;
+  border: 1px solid rgba(0,0,0,.125);
+  border-radius: 0.5rem;
+}
+
+.accordion-button {
+  padding: 1.25rem;
+  font-weight: 500;
+  background-color: white;
+  border: none;
+  border-radius: 0.5rem !important;
+}
+
+.accordion-button:not(.collapsed) {
+  color: var(--primary-color);
+  background-color: rgba(255, 107, 107, 0.1);
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+  border-color: rgba(255, 107, 107, 0.25);
+}
+
+.accordion-body {
+  padding: 1.25rem;
+}
+
+.category-detail {
+  padding: 2rem;
+  background: #fff;
+  margin: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.category-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.category-header h2 {
+  font-size: 2rem;
+  margin: 1rem 0;
+}
+
+.category-header p {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.back-button:hover {
+  text-decoration: underline;
+}
+
+.category-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.product-description {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+.menu-section .product-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.menu-section .product-card:hover {
+  transform: translateY(-5px);
+}
+
+.menu-section .product-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+
+.menu-section .product-info {
+  padding: 1.5rem;
+}
+
+/* Game section styles */
+.game-hero {
+  position: relative;
+  height: 500px;
+  width: 100%;
+}
+
+#webgl-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.game-hero .hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.game-category-card {
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.game-category-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.game-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+  cursor: pointer;
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+}
+
+.game-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.game-info {
+  padding: 1.5rem;
+}
+
+.game-name {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.game-description {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.play-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.play-btn:hover {
+  background: #ff5252;
+}
+
+.game-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.game-modal-content {
+  background: white;
+  width: 90%;
+  height: 90%;
+  border-radius: 15px;
+  position: relative;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.game-frame-container {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+}
+
+/* Contact styles */
+.contact-section {
+  background-color: #f8f9fa;
+}
+
+.contact-info, .contact-form {
+  height: 100%;
+}
+
+.contact-info svg {
+  vertical-align: middle;
+  color: var(--primary-color);
+}
+
+.contact-info span {
+  vertical-align: middle;
+}
+
+.contact-form .form-control {
+  border: 1px solid #dee2e6;
+  padding: 0.75rem;
+}
+
+.contact-form .form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25);
+}
+
+.contact-form label {
+  font-weight: 500;
+  color: #333;
+}
+
+.virtual-assistant {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 3rem;
+}
+
+#character-container {
+  width: 400px;
+  height: 400px;
+  background: #f0f0f0;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+}
+
+.chat-interface {
+  width: 100%;
+  max-width: 600px;
+  background: white;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.chat-messages {
+  height: 300px;
+  overflow-y: auto;
+  padding: 1rem;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.chat-input {
+  display: flex;
+  gap: 1rem;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.chat-input button {
+  padding: 0.5rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Music section styles */
+.music-section {
+  background: #f8f9fa;
+}
+
+.playlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.playlist-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.playlist-card:hover {
+  transform: translateY(-5px);
+}
+
+.artist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.artist-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.artist-card:hover {
+  transform: translateY(-5px);
+}
+
+.artist-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.artist-info {
+  padding: 1.5rem;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+}
+
+/* Settings Page Styles */
+.settings-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-color);
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.settings-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.settings-header h2 {
+  margin: 0;
+  margin-left: 1rem;
+  color: var(--text-color);
+}
+
+.settings-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--text-color);
+  padding-bottom: 1rem;
+}
+
+.settings-tab {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.settings-tab.active {
+  opacity: 1;
+  border-bottom: 2px solid var(--primary-color);
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.theme-option {
+  cursor: pointer;
+  padding: 1rem;
+  border-radius: 8px;
+  background: var(--card-bg);
+  transition: transform 0.3s;
+}
+
+.theme-option:hover {
+  transform: translateY(-5px);
+}
+
+.theme-option.active {
+  border: 2px solid var(--primary-color);
+}
+
+.theme-preview {
+  width: 100%;
+  height: 150px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.preview-header {
+  height: 30px;
+  background: var(--header-bg);
+}
+
+.preview-content {
+  height: calc(100% - 30px);
+  padding: 0.5rem;
+}
+
+.preview-card {
+  height: 30px;
+  background: var(--card-bg);
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+}
+
+/* Sound Settings Styles */
+.setting-item {
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-color);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* Add these styles */
+.game-hero {
+  position: relative;
+  height: 500px;
+  width: 100%;
+}
+
+#webgl-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.game-hero .hero-content {
+  position: relative;
+  z-index: 2;
+}
+</style>
+</head>
+<body>
+
+<div id="app" class="app desktop-view">
+  <header class="header">
+    <h1>Your App Name Here</h1>
+    <div class="mobile-menu-icon" @click="toggleMenu">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </div>
+  </header>
+
+  <div class="side-menu" :class="{ active: menuOpen }">
+    <div class="side-menu-content">
+      <div class="menu-header">
+        <h3>Menu</h3>
+        <button class="close-menu" @click="toggleMenu">×</button>
+      </div>
+      <div class="menu-items">
+        <a href="#" class="menu-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          My Account
+        </a>
+        <a href="#" class="menu-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+          Inbox
+        </a>
+        <a href="#" class="menu-item" @click.prevent="openSettings">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          Settings
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <nav class="nav-tabs">
+    <div v-for="tab in tabs" :key="tab.id" :class="['nav-tab', { active: currentTab === tab.id }]" @click="currentTab = tab.id">
+      {{ tab.name }}
+    </div>
+  </nav>
+
+  <main class="content">
+    <!-- Shoes content -->
+    <div v-if="currentTab === 'gym'" class="gym-section">
+      <template v-if="!selectedCategory">
+        <!-- Hero Section -->
+        <section class="hero">
+          <div class="slide" v-for="(image, index) in heroImages" :key="index" :class="{ active: currentSlide === index }" :style="{ backgroundImage: `url(${image})` }">
+            <div class="hero-content">
+              <h1>Welcome to the Prototype</h1>
+              <p>Make Your App Today!</p>
+              <a href="/new-arrivals" class="cta-button">View New Arrivals</a>
+            </div>
+          </div>
+          <div class="slider-controls">
+            <button v-for="(image, index) in heroImages" :key="index" @click="setSlide(index)" :class="['slider-dot', { active: currentSlide === index }]">
+            </button>
+          </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section class="categories">
+          <div v-for="category in categories" :key="category.name" class="category-card" @click="selectedCategory = category.link.substring(1)">
+            <img :src="category.image" :alt="category.name + ' Sneakers'" class="category-image">
+            <div class="category-info">
+              <h2 class="category-name">{{ category.name }}</h2>
+              <button class="cta-button">See More</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Featured Products Section -->
+        <section class="featured-products">
+          <h2>Featured Products</h2>
+          <div class="product-slider">
+            <div v-for="product in featuredProducts" :key="product.name" class="product-card">
+              <img :src="product.image" :alt="product.name" class="product-image">
+              <div class="product-info">
+                <h3 class="product-name">{{ product.name }}</h3>
+                <p class="product-price">{{ product.price }}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Basic Products Section -->
+        <section class="basic-products">
+          <div v-for="product in basicProducts" :key="product.name" class="product-card">
+            <img :src="product.image" :alt="product.name" class="product-image">
+            <div class="product-info">
+              <h3 class="product-name">{{ product.name }}</h3>
+              <p class="product-price">{{ product.price }}</p>
+            </div>
+          </div>
+        </section>
+      </template>
+
+      <!-- Show category detail only when a category is selected -->
+      <section v-if="selectedCategory" class="category-detail">
+        <div class="category-header">
+          <button class="back-button" @click="selectedCategory = null">← Back</button>
+          <h2>{{ categoryContent[selectedCategory].title }}</h2>
+          <p>{{ categoryContent[selectedCategory].description }}</p>
+        </div>
+        <div class="category-products">
+          <div v-for="product in categoryContent[selectedCategory].products" :key="product.name" class="product-card">
+            <img :src="product.image" :alt="product.name" class="product-image">
+            <div class="product-info">
+              <h3 class="product-name">{{ product.name }}</h3>
+              <p class="product-price">{{ product.price }}</p>
+              <button class="book-btn">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Class booking content -->
+    <div v-if="currentTab === 'crossfit'" class="booking-section">
+      <section class="hero">
+        <div class="hero-content">
+          <h1>Accessories Collection</h1>
+          <p>Style Meets Function</p>
+        </div>
+      </section>
+
+      <section class="accessories-grid">
+        <div v-for="item in accessories" :key="item.name" class="accessory-card">
+          <img :src="item.image" :alt="item.name" class="accessory-image">
+          <div class="accessory-info">
+            <h3 class="accessory-name">{{ item.name }}</h3>
+            <p class="accessory-description">{{ item.description }}</p>
+            <p class="accessory-price">{{ item.price }}</p>
+            <button class="book-btn">Add to Cart</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Menu content -->
+    <div v-if="currentTab === 'menu'" class="menu-section">
+      <section class="hero">
+        <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4')">
+          <div class="hero-content">
+            <h1>Our Menu</h1>
+            <p>Delicious Food Made Fresh Daily</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categories Section -->
+      <section class="categories">
+        <div v-for="category in menuCategories" :key="category.name" class="category-card" @click="selectedMenuCategory = category.link.substring(1)">
+          <img :src="category.image" :alt="category.name" class="category-image">
+          <div class="category-info">
+            <h2 class="category-name">{{ category.name }}</h2>
+            <button class="cta-button">View Menu</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Menu Category Detail -->
+      <section v-if="selectedMenuCategory" class="category-detail">
+        <div class="category-header">
+          <button class="back-button" @click="selectedMenuCategory = null">← Back</button>
+          <h2>{{ menuContent[selectedMenuCategory].title }}</h2>
+          <p>{{ menuContent[selectedMenuCategory].description }}</p>
+        </div>
+        <div class="category-products">
+          <div v-for="item in menuContent[selectedMenuCategory].items" :key="item.name" class="product-card">
+            <img :src="item.image" :alt="item.name" class="product-image">
+            <div class="product-info">
+              <h3 class="product-name">{{ item.name }}</h3>
+              <p class="product-description">{{ item.description }}</p>
+              <p class="product-price">{{ item.price }}</p>
+              <button class="book-btn">Order Now</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Games content -->
+    <div v-if="currentTab === 'games'" class="games-section">
+      <template v-if="!selectedGameCategory">
+        <!-- Hero Section with WebGL Background -->
+        <section class="game-hero hero">
+          <div id="webgl-background"></div>
+          <div class="hero-content">
+            <h1>Steel Cyclone Games</h1>
+            <p>Play Our Latest Releases</p>
+          </div>
+        </section>
+
+        <!-- Game Categories -->
+        <section class="categories game-categories">
+          <div v-for="category in gameCategories" 
+               :key="category.name" 
+               class="category-card game-category-card" 
+               @click="selectedGameCategory = category.link.substring(1)">
+            <img :src="category.image" :alt="category.name" class="category-image">
+            <div class="category-info">
+              <h2 class="category-name">{{ category.name }}</h2>
+              <button class="cta-button">Play Now</button>
+            </div>
+          </div>
+        </section>
+      </template>
+
+      <!-- Game Category Detail -->
+      <section v-if="selectedGameCategory" class="category-detail game-detail">
+        <div class="category-header">
+          <button class="back-button" @click="selectedGameCategory = null">← Back</button>
+          <h2>{{ gameContent[selectedGameCategory].title }}</h2>
+          <p>{{ gameContent[selectedGameCategory].description }}</p>
+        </div>
+        <div class="category-products game-grid">
+          <div v-for="game in gameContent[selectedGameCategory].games" 
+               :key="game.name" 
+               class="game-card"
+               @click="openGame(game)">
+            <img :src="game.image" :alt="game.name" class="game-image">
+            <div class="game-info">
+              <h3 class="game-name">{{ game.name }}</h3>
+              <p class="game-description">{{ game.description }}</p>
+              <button class="play-btn">Play Now</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Game Modal -->
+      <div v-if="showGameModal" class="game-modal">
+        <div class="game-modal-content">
+          <button class="close-modal" @click="closeGame">&times;</button>
+          <div class="game-frame-container">
+            <iframe :src="'https://gamemonetize.com/embed/' + currentGame.gameId"
+                    frameborder="0"
+                    width="100%"
+                    height="100%"
+                    allowfullscreen>
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Music content -->
+    <div v-if="currentTab === 'music'" class="music-section">
+      <section class="hero">
+        <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819')">
+          <div class="hero-content">
+            <h1>Music Collection</h1>
+            <p>Listen to Your Favorite Tracks</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured Playlists -->
+      <section class="featured-playlists">
+        <h2 class="text-center my-4">Featured Playlists</h2>
+        <div class="playlist-grid">
+          <!-- Spotify Playlist -->
+          <div class="playlist-card">
+            <iframe style="border-radius:12px" 
+                    src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator" 
+                    width="100%" 
+                    height="352" 
+                    frameBorder="0" 
+                    allowfullscreen="" 
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                    loading="lazy">
+            </iframe>
+          </div>
+          
+          <!-- Apple Music Playlist -->
+          <div class="playlist-card">
+            <iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" 
+                    frameborder="0" 
+                    height="450" 
+                    style="width:100%;max-width:660px;overflow:hidden;border-radius:12px;" 
+                    sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" 
+                    src="https://embed.music.apple.com/us/playlist/todays-hits/pl.f4d106fed2bd41149aaacabb233eb5eb">
+            </iframe>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured Artists -->
+      <section class="featured-artists">
+        <h2 class="text-center my-4">Featured Artists</h2>
+        <div class="artist-grid">
+          <div v-for="artist in artists" :key="artist.name" class="artist-card">
+            <img :src="artist.image" :alt="artist.name" class="artist-image">
+            <div class="artist-info">
+              <h3>{{ artist.name }}</h3>
+              <p>{{ artist.genre }}</p>
+              <!-- SoundCloud Embed -->
+              <iframe v-if="artist.soundcloud"
+                      width="100%" 
+                      height="166" 
+                      scrolling="no" 
+                      frameborder="no" 
+                      allow="autoplay" 
+                      :src="artist.soundcloud">
+              </iframe>
+              <!-- YouTube Music Embed -->
+              <iframe v-if="artist.youtube"
+                      width="100%"
+                      height="315"
+                      :src="artist.youtube"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Music Categories -->
+      <section class="music-categories">
+        <h2 class="text-center my-4">Browse by Genre</h2>
+        <div class="category-grid">
+          <div v-for="category in musicCategories" :key="category.name" class="category-card">
+            <img :src="category.image" :alt="category.name" class="category-image">
+            <div class="category-info">
+              <h3>{{ category.name }}</h3>
+              <p>{{ category.description }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- FAQ section -->
+    <div v-if="currentTab === 'faq'" class="faq-section">
+      <section class="faq">
+        <div class="container">
+          <h2 class="text-center mb-4">Frequently Asked Questions</h2>
+          
+          <!-- Replace virtual assistant with iframe -->
+          <div class="virtual-assistant mb-5">
+            <iframe src="chatbot.html" 
+                    style="width: 100%; height: 700px; border: none; border-radius: 10px;"
+                    title="AI Chatbot">
+            </iframe>
+          </div>
+
+          <!-- FAQ accordion follows -->
+          <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+              <h3 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                  What is a chatbot?
+                </button>
+              </h3>
+              <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item">
+              <h3 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                  Do you have a referral program?
+                </button>
+              </h3>
+              <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h3 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                  How do I track my orders?
+                </button>
+              </h3>
+              <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </div>
+
+    <!-- Contact section -->
+    <div v-if="currentTab === 'contact'" class="contact-section">
+      <section class="hero">
+        <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1423666639041-f56000c27a9a')">
+          <div class="hero-content">
+            <h1>Contact Us</h1>
+            <p>We'd Love to Hear From You</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact-content">
+        <div class="container py-5">
+          <div class="contact-form bg-white p-4 rounded shadow">
+            <h3 class="mb-4">Get in Touch</h3>
+            <div class="row mb-4">
+              <div class="col-md-12">
+                <div class="mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                  </svg>
+                  <span>(555) 123-4567</span>
+                </div>
+                <div class="mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                  </svg>
+                  <span>contact@yourapp.com</span>
+                </div>
+                <div class="mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  <span>123 App Street, Tech City, 12345</span>
+                </div>
+              </div>
+            </div>
+            <hr class="mb-4">
+            <h3 class="mb-4">Send us a Message</h3>
+            <form @submit.prevent="submitForm">
+              <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" required>
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" required>
+              </div>
+              <div class="mb-3">
+                <label for="subject" class="form-label">Subject</label>
+                <input type="text" class="form-control" id="subject" required>
+              </div>
+              <div class="mb-3">
+                <label for="message" class="form-label">Message</label>
+                <textarea class="form-control" id="message" rows="5" required></textarea>
+              </div>
+              <button type="submit" class="btn book-btn w-100">Send Message</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Settings Page -->
+    <div v-if="showSettings" class="settings-page">
+      <div class="settings-container">
+        <div class="settings-header">
+          <button class="back-button" @click="showSettings = false">← Back</button>
+          <h2>Settings</h2>
+        </div>
+
+        <div class="settings-tabs">
+          <button 
+            v-for="tab in ['themes', 'sound', 'time']" 
+            :key="tab"
+            :class="['settings-tab', {active: currentSettingsTab === tab}]"
+            @click="currentSettingsTab = tab"
+          >
+            {{ tab.charAt(0).toUpperCase() + tab.slice(1) }}
+          </button>
+        </div>
+
+        <!-- Themes Section -->
+        <div v-if="currentSettingsTab === 'themes'" class="settings-section">
+          <h3>Theme Options</h3>
+          <div class="theme-grid">
+            <div
+              v-for="(theme, name) in themes"
+              :key="name"
+              :class="['theme-option', {active: selectedTheme === name}]"
+              @click="applyTheme(name)"
+            >
+              <div class="theme-preview" :style="getThemePreviewStyle(theme)">
+                <div class="preview-header"></div>
+                <div class="preview-content">
+                  <div class="preview-card"></div>
+                  <div class="preview-card"></div>
+                </div>
+              </div>
+              <span>{{ name.charAt(0).toUpperCase() + name.slice(1) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sound Settings Section -->
+        <div v-if="currentSettingsTab === 'sound'" class="settings-section">
+          <h3>Sound Settings</h3>
+          <div class="setting-item">
+            <label class="switch">
+              <input type="checkbox" v-model="soundEnabled">
+              <span class="slider round"></span>
+            </label>
+            <span>Enable Sound</span>
+          </div>
+          <div class="setting-item">
+            <label>Volume</label>
+            <input 
+              type="range" 
+              v-model="volume" 
+              min="0" 
+              max="100"
+              :disabled="!soundEnabled"
+            >
+            <span>{{ volume }}%</span>
+          </div>
+        </div>
+
+        <!-- Time Settings Section -->
+        <div v-if="currentSettingsTab === 'time'" class="settings-section">
+          <h3>Time Format</h3>
+          <div class="setting-item">
+            <select v-model="timeFormat">
+              <option value="12h">12-hour</option>
+              <option value="24h">24-hour</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+  <div class="view-toggle" @click="toggleView" :title="isMobileView ? 'Switch to Desktop View' : 'Switch to Mobile View'">
+    <svg v-if="isMobileView" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+      <line x1="8" y1="21" x2="16" y2="21"></line>
+      <line x1="12" y1="17" x2="12"></line>
+    </svg>
+    <svg v-else="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+      <line x1="12" y1="18" x2="12" y2="18"></line>
+    </svg>
+  </div>
+  <footer class="footer">
+    <p>© 2024 Steel Cyclone Studios LLC. All rights reserved.</p>
+  </footer>
+</div>
+
+<script>
+new Vue({
+  el: '#app',
+  data: {
+    menuOpen: false,
+    showSettings: false,
+    currentSettingsTab: 'themes',
+    selectedTheme: 'default',
+    themes: {
+      default: {
+        '--primary-color': '#ff6b6b',
+        '--secondary-color': '#4ecdc4',
+        '--bg-color': '#f8f9fa',
+        '--text-color': '#333',
+        '--header-bg': '#222',
+        '--card-bg': 'white'
+      },
+      dark: {
+        '--primary-color': '#7c5dfa',
+        '--secondary-color': '#5eead4',
+        '--bg-color': '#141625',
+        '--text-color': '#dfe3fa',
+        '--header-bg': '#1e2139',
+        '--card-bg': '#1e2139'
+      },
+      light: {
+        '--primary-color': '#ff6b6b',
+        '--secondary-color': '#4ecdc4', 
+        '--bg-color': '#ffffff',
+        '--text-color': '#141625',
+        '--header-bg': '#f8f9fa',
+        '--card-bg': '#ffffff'
+      },
+      contrast: {
+        '--primary-color': '#ffff00',
+        '--secondary-color': '#00ffff',
+        '--bg-color': '#000000',
+        '--text-color': '#ffffff',
+        '--header-bg': '#333333',
+        '--card-bg': '#222222'
+      }
+    },
+    soundEnabled: true,
+    volume: 80,
+    timeFormat: '24h',
+    currentTab: 'gym',
+    activeDay: 'day1',
+    isSubscriptionActive: true,
+    isMobileView: false, // Changed from true to false
+    currentSlide: 0,
+    selectedCategory: null, // Track which category is selected
+    selectedMenuCategory: null,
+    selectedGameCategory: null,
+    showGameModal: false,
+    currentGame: null,
+    menuCategories: [
+      {
+        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+        name: "Starters",
+        link: "/starters"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1",
+        name: "Main Course",
+        link: "/mains"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187",
+        name: "Desserts",
+        link: "/desserts"
+      }
+    ],
+    menuContent: {
+      'starters': {
+        title: 'Appetizers & Starters',
+        description: 'Begin your culinary journey with our delicious appetizers',
+        items: [
+          {
+            image: "https://images.unsplash.com/photo-1541014741259-de529411b96a",
+            name: "Caesar Salad",
+            description: "Fresh romaine lettuce, parmesan cheese, croutons with classic caesar dressing",
+            price: "9.99 €"
+          },
+          {
+            image: "https://images.unsplash.com/photo-1533040087945-e08607330d08",
+            name: "Bruschetta",
+            description: "Toasted bread topped with fresh tomatoes, basil, and olive oil",
+            price: "7.99 €"
+          }
+        ]
+      },
+      'mains': {
+        title: 'Main Courses',
+        description: 'Satisfy your hunger with our chef\'s special main courses',
+        items: [
+          {
+            image: "https://images.unsplash.com/photo-1544025162-d76694265947",
+            name: "Ribeye Steak",
+            description: "Prime cut ribeye steak with roasted vegetables and red wine sauce",
+            price: "29.99 €"
+          },
+          {
+            image: "https://images.unsplash.com/photo-1595295333158-4742f28fbd85",
+            name: "Grilled Salmon",
+            description: "Fresh Atlantic salmon with lemon butter sauce and asparagus",
+            price: "24.99 €"
+          }
+        ]
+      },
+      'desserts': {
+        title: 'Desserts',
+        description: 'End your meal on a sweet note with our homemade desserts',
+        items: [
+          {
+            image: "https://images.unsplash.com/photo-1551024506-0bccd828d307",
+            name: "Chocolate Lava Cake",
+            description: "Warm chocolate cake with a molten center, served with vanilla ice cream",
+            price: "8.99 €"
+          },
+          {
+            image: "https://images.unsplash.com/photo-1488477181946-6428a0291777",
+            name: "Berry Cheesecake",
+            description: "Classic New York cheesecake topped with fresh mixed berries",
+            price: "7.99 €"
+          }
+        ]
+      }
+    },
+    categoryContent: {
+      'hightop': {
+        title: 'High Top Sneakers',
+        description: 'Classic high top sneakers for ultimate style and ankle support',
+        products: [
+          {
+            image: "https://images.unsplash.com/photo-1515555230216-82228b88ea98",
+            name: "Classic High Top",
+            price: "129,99 €"
+          },
+          {
+            image: "https://images.unsplash.com/photo-1586525198428-225f6f12cff5",
+            name: "Urban High Top",
+            price: "149,99 €"
+          }
+        ]
+      },
+      'lowtop': {
+        title: 'Low Top Sneakers',
+        description: 'Sleek and comfortable low top designs for everyday wear',
+        products: [
+          {
+            image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+            name: "Classic Low Top",
+            price: "119,99 €"
+          },
+          {
+            image: "https://images.unsplash.com/photo-1579338559194-a162d19bf842",
+            name: "Sport Low Top",
+            price: "139,99 €"
+          }
+        ]
+      },
+      'women': {
+        title: 'Womens Collection',
+        description: 'Stylish and comfortable sneakers designed specifically for women',
+        products: [
+          {
+            image: "https://images.unsplash.com/photo-1571601035754-5c927f2d7edc",
+            name: "Women's Signature",
+            price: "134,99 €"
+          },
+          {
+            image: "https://images.unsplash.com/photo-1618898909019-010e4e234c55",
+            name: "Women's Sport Elite",
+            price: "144,99 €"
+          }
+        ]
+      }
+    },
+    currentSlide: 0,
+    heroImages: [
+      'https://images.unsplash.com/photo-1542291026-7eec264c27ff', // Red Nike sneaker
+      'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a'  // White sneaker pair
+    ],
+    slideInterval: null,
+    categories: [
+      {
+        image: "https://images.unsplash.com/photo-1515555230216-82228b88ea98",
+        name: "High Top",
+        link: "/hightop"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+        name: "Low Top",
+        link: "/lowtop"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1618898909019-010e4e234c55",
+        name: "Women",
+        link: "/women"
+      }
+    ],
+    featuredProducts: [
+      {
+        image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77",
+        name: "Classic Sport",
+        price: "159,99 €"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a",
+        name: "Urban Runner",
+        price: "179,99 €"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa",
+        name: "Street Style",
+        price: "129,99 €"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1552346154-21d32810aba3",
+        name: "Premium Comfort",
+        price: "169,99 €"
+      }
+    ],
+    basicProducts: [
+      {
+        image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+        name: "Sport Elite",
+        price: "139,99 €"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1579338559194-a162d19bf842",
+        name: "Urban Classic",
+        price: "189,99 €"
+      }
+    ],
+    accessories: [
+      {
+        image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7",
+        name: "Urban Slide Backpack",
+        price: "89,99 €",
+        description: "Sleek contemporary design with water-resistant materials"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62", 
+        name: "Sports Duffle Bag",
+        price: "69,99 €",
+        description: "Versatile carry-all for gym and travel"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3",
+        name: "Essential Tote",
+        price: "49,99 €",
+        description: "Everyday bag with multiple compartments"
+      }
+    ],
+    gameCategories: [
+      {
+        image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc",
+        name: "Action Games",
+        link: "/action"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1511512578047-dfb367046420",
+        name: "Adventure Games", 
+        link: "/adventure"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8",
+        name: "Puzzle Games",
+        link: "/puzzle" 
+      }
+    ],
+    gameContent: {
+      'action': {
+        title: 'Action Games',
+        description: 'Fast-paced action games from Steel Cyclone Studios',
+        games: [
+          {
+            image: "https://images.unsplash.com/photo-1542751371-adc38448a05e",
+            name: "Cyber Rush",
+            description: "High-speed futuristic racing game",
+            gameId: "game1"
+          },
+          {
+            image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f",
+            name: "Space Combat",
+            description: "Epic space battles and exploration",
+            gameId: "game2" 
+          }
+        ]
+      },
+      'adventure': {
+        title: 'Adventure Games',
+        description: 'Epic story-driven adventures',
+        games: [
+          {
+            image: "https://images.unsplash.com/photo-1551103782-8ab07afd45c1",
+            name: "Crystal Quest",
+            description: "Magical adventure in a fantasy realm",
+            gameId: "game3"
+          },
+          {
+            image: "https://images.unsplash.com/photo-1548484352-ea579e93b434",
+            name: "Desert Explorer",
+            description: "Survive and explore vast deserts",
+            gameId: "game4"
+          }
+        ]
+      },
+      'puzzle': {
+        title: 'Puzzle Games',
+        description: 'Brain-teasing puzzle challenges',
+        games: [
+          {
+            image: "https://images.unsplash.com/photo-1547989453-11e67ffb3885",
+            name: "Mind Maze",
+            description: "Complex puzzles and riddles",
+            gameId: "game5"
+          },
+          {
+            image: "https://images.unsplash.com/photo-1559638753-d8838a6ac071",
+            name: "Color Match",
+            description: "Fast-paced color matching game",
+            gameId: "game6"
+          }
+        ]
+      }
+    },
+    tabs: [
+      { id: 'gym', name: 'Home' },
+      { id: 'crossfit', name: 'Accessories' },
+      { id: 'games', name: 'Games' },
+      { id: 'menu', name: 'Menu' },
+      { id: 'music', name: 'Music' }, // New tab
+      { id: 'faq', name: 'FAQ' },
+      { id: 'contact', name: 'Contact' }
+    ],
+    artists: [
+      {
+        image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+        name: "Sarah Johnson",
+        genre: "Pop/R&B",
+        soundcloud: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/823876079",
+        youtube: null
+      },
+      {
+        image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4",
+        name: "Electric Dreams",
+        genre: "Electronic",
+        soundcloud: null,
+        youtube: "https://www.youtube.com/embed/playlist?list=PLMC9KNkIncKtGvr2kFRuXBVmBev6cAJ2u"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1511367461989-f85a21fda167",
+        name: "The Generators",
+        genre: "Rock",
+        soundcloud: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/247748574",
+        youtube: null
+      }
+    ],
+    musicCategories: [
+      {
+        image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4",
+        name: "Electronic",
+        description: "Best electronic music from around the world"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+        name: "Pop",
+        description: "Latest pop hits and trending artists"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f", 
+        name: "Rock",
+        description: "Classic and modern rock collections"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1511367461989-f85a21fda167",
+        name: "Jazz",
+        description: "Smooth jazz and classical favorites"
+      }
+    ]
+  },
+  methods: {
+    toggleMenu() {
+      this.menuOpen = !this.menuOpen;
+    },
+    toggleView() {
+      this.isMobileView = !this.isMobileView;
+      const app = document.querySelector('.app');
+      if (!this.isMobileView) {
+        app.classList.add('desktop-view');
+      } else {
+        app.classList.remove('desktop-view');
+      }
+    },
+    setSlide(index) {
+      this.currentSlide = index;
+    },
+    nextSlide() {
+      this.currentSlide = (this.currentSlide + 1) % this.heroImages.length;
+    },
+    startSlideshow() {
+      this.slideInterval = setInterval(() => {
+        this.nextSlide();
+      }, 5000);
+    },
+    stopSlideshow() {
+      if (this.slideInterval) {
+        clearInterval(this.slideInterval);
+      }
+    },
+    openGame(game) {
+      this.currentGame = game;
+      this.showGameModal = true;
+      document.body.style.overflow = 'hidden';
+    },
+    closeGame() {
+      this.showGameModal = false;
+      this.currentGame = null;
+      document.body.style.overflow = 'auto';
+    },
+    initWebGL() {
+      if (this.currentTab === 'games') {
+        // Clear any existing canvas
+        const container = document.getElementById('webgl-background');
+        if (container) {
+          while (container.firstChild) {
+            container.removeChild(container.firstChild);
+          }
+        }
+
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+        
+        // Add particles
+        const geometry = new THREE.BufferGeometry();
+        const vertices = [];
+        
+        for (let i = 0; i < 10000; i++) {
+          vertices.push(
+            Math.random() * 2000 - 1000,
+            Math.random() * 2000 - 1000,
+            Math.random() * 2000 - 1000
+          );
+        }
+        
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        const particles = new THREE.Points(
+          geometry,
+          new THREE.PointsMaterial({ color: 0x888888, size: 2 })
+        );
+        
+        scene.add(particles);
+        camera.position.z = 1000;
+        
+        const animate = () => {
+          if (this.currentTab === 'games') {
+            requestAnimationFrame(animate);
+            particles.rotation.x += 0.001;
+            particles.rotation.y += 0.001;
+            renderer.render(scene, camera);
+          }
+        };
+        
+        // Handle window resize
+        const handleResize = () => {
+          const width = container.clientWidth;
+          const height = container.clientHeight;
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+          renderer.setSize(width, height);
+        };
+
+        window.addEventListener('resize', handleResize);
+        
+        animate();
+      }
+    },
+    async submitForm() {
+      // Here you would typically handle the form submission
+      alert('Thank you for your message! We will get back to you soon.');
+      // Reset form fields
+      document.querySelector('.contact-form form').reset();
+    },
+    applyTheme(themeName) {
+      this.selectedTheme = themeName;
+      const theme = this.themes[themeName];
+      Object.entries(theme).forEach(([property, value]) => {
+        document.documentElement.style.setProperty(property, value);
+      });
+      // Save theme preference
+      localStorage.setItem('selectedTheme', themeName);
+    },
+    getThemePreviewStyle(theme) {
+      return {
+        '--primary-color': theme['--primary-color'],
+        '--secondary-color': theme['--secondary-color'],
+        '--bg-color': theme['--bg-color'],
+        '--text-color': theme['--text-color'],
+        '--header-bg': theme['--header-bg'],
+        '--card-bg': theme['--card-bg'],
+        background: theme['--bg-color'],
+        color: theme['--text-color']
+      };
+    },
+    openSettings() {
+      this.showSettings = true;
+      this.currentSettingsTab = 'themes';
+    }
+  },
+  mounted() {
+    this.startSlideshow();
+    this.$nextTick(() => {
+      this.initWebGL();
+    });
+  },
+  beforeDestroy() {
+    this.stopSlideshow();
+  },
+  watch: {
+    currentTab(newTab) {
+      if (newTab === 'games') {
+        this.$nextTick(() => {
+          this.initWebGL();
+        });
+      }
+    }
+  }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body></html>
