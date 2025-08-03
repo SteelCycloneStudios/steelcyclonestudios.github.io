@@ -48,7 +48,7 @@
       transition: max-width 0.3s ease;
     }
 
-    .app.desktop-view {
+   .app.desktop-view {
       width: 100%;
       max-width: none;
       margin: 0;
@@ -152,17 +152,32 @@
     .nav-tab {
       flex: 1;
       padding: 1rem;
-      color: white;
+      color: black;
       text-align: center;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: all 0.3s ease;
       white-space: nowrap;
       min-width: 100px;
+      background-image: url('menu-bg.gif');
+      background-size: 100% 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      font-weight: 500;
+      text-shadow: none;
+    }
+
+    .nav-tab:hover {
+      background-image: url('menu1.gif');
+      background-size: 100% 100%;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
     .nav-tab.active {
-      background: #444;
+      background-image: url('menu1.gif');
+      background-size: 100% 100%;
       border-bottom: 3px solid var(--primary-color);
+      transform: translateY(-1px);
     }
 
     .workout-card {
@@ -1070,7 +1085,7 @@
                 <p>{{ artist.genre }}</p>
                 <iframe v-if="artist.soundcloud"
                         width="100%" 
-                        height="166" 
+                        height="300" 
                         scrolling="no" 
                         frameborder="no" 
                         allow="autoplay" 
@@ -1106,7 +1121,7 @@
 
       <!-- Games content -->
       <div v-if="currentTab === 'games'" class="games-section">
-        <iframe src="games.html" style="width:100%; height:100vh; border:none;" allowfullscreen></iframe>
+        <iframe src="https://www.steelcyclonestudios.com/games.html" style="width:100%; height:100vh; border:none;" allowfullscreen></iframe>
       </div>
 
       <!-- Steel Wear content -->
@@ -1429,7 +1444,7 @@
       artists: [{
         name: 'MIRAAGE',
         genre: 'Rap/ Hip-Hop',
-        image: 'img/miraage.png',
+        image: '/miraage.PNG',
         soundcloud: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/243533823&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true'
       }, {
         name: 'B Thorough - Out The Mud',
