@@ -45,11 +45,20 @@ class ShoesApp {
             }
         ];
 
+        this.heroImages = [
+            'sapphire-blue.png',
+            'black-yellow.png', 
+            'classic.png'
+        ];
+        this.currentSlide = 0;
+        this.slideInterval = null;
+
         this.init();
     }
 
     init() {
         this.setupThemeToggle();
+        this.setupHeroSlider();
         this.loadProducts();
         this.setupKeyboardNavigation();
     }
@@ -85,10 +94,91 @@ class ShoesApp {
         themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
     }
 
+    setupHeroSlider() {
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.slider-dot');
+        
+        // Set initial active states
+        if (slides.length > 0) {
+            slides[0].classList.add('active');
+            dots[0].classList.add('active');
+        }
+
+        // Add click listeners to dots
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                this.setSlide(index);
+            });
+        });
+
+        // Start automatic slideshow
+        this.startSlideshow();
+
+        // Pause slideshow on hover
+        const heroSection = document.getElementById('heroSection');
+        heroSection.addEventListener('mouseenter', () => {
+            this.stopSlideshow();
+        });
+
+        heroSection.addEventListener('mouseleave', () => {
+            this.startSlideshow();
+        });
+    }
+
+    setSlide(index) {
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.slider-dot');
+        
+        // Remove active class from all slides and dots
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+        // Add active class to current slide and dot
+        if (slides[index] && dots[index]) {
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+        }
+        
+        this.currentSlide = index;
+    }
+
+    nextSlide() {
+        const slides = document.querySelectorAll('.slide');
+        this.currentSlide = (this.currentSlide + 1) % slides.length;
+        this.setSlide(this.currentSlide);
+    }
+
+    startSlideshow() {
+        this.stopSlideshow(); // Clear any existing interval
+        this.slideInterval = setInterval(() => {
+            this.nextSlide();
+        }, 5000);
+    }
+
+    stopSlideshow() {
+        if (this.slideInterval) {
+            clearInterval(this.slideInterval);
+            this.slideInterval = null;
+        }
+    }
+
     setupKeyboardNavigation() {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 // Close any modals or overlays if needed
+            }
+            // Add arrow key navigation for slides
+            if (e.key === 'ArrowLeft') {
+                const slides = document.querySelectorAll('.slide');
+                this.currentSlide = (this.currentSlide - 1 + slides.length) % slides.length;
+                this.setSlide(this.currentSlide);
+                this.stopSlideshow();
+                setTimeout(() => this.startSlideshow(), 3000); // Restart after 3 seconds
+            }
+            if (e.key === 'ArrowRight') {
+                this.nextSlide();
+                this.stopSlideshow();
+                setTimeout(() => this.startSlideshow(), 3000); // Restart after 3 seconds
             }
         });
     }
@@ -177,6 +267,86 @@ class ShoesApp {
                 }
             });
         });
+
+        // Setup search functionality
+        this.setupSearch();
+    }
+
+    setupSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        
+        if (!searchInput || !searchButton) return;
+
+        const performSearch = () => {
+            const query = searchInput.value.trim().toLowerCase();
+            
+            if (!query) {
+                this.showAllProducts();
+                return;
+            }
+
+            const filteredProducts = this.products.filter(product => 
+                product.name.toLowerCase().includes(query) ||
+                product.tag.toLowerCase().includes(query)
+            );
+
+            this.displayFilteredProducts(filteredProducts, query);
+        };
+
+        // Search on button click
+        searchButton.addEventListener('click', performSearch);
+
+        // Search on Enter key
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Real-time search (optional - debounced)
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                if (searchInput.value.trim().length >= 2) {
+                    performSearch();
+                } else if (searchInput.value.trim().length === 0) {
+                    this.showAllProducts();
+                }
+            }, 300);
+        });
+    }
+
+    displayFilteredProducts(filteredProducts, query) {
+        const productsGrid = document.getElementById('productsGrid');
+        
+        if (filteredProducts.length === 0) {
+            productsGrid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                    <h3 style="color: var(--text-secondary); margin-bottom: 1rem;">No products found</h3>
+                    <p style="color: var(--text-secondary);">No products match your search for "${query}"</p>
+                    <button onclick="window.shoesApp.showAllProducts()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--primary-color); color: white; border: none; border-radius: var(--border-radius-sm); cursor: pointer;">Show All Products</button>
+                </div>
+            `;
+        } else {
+            const productCards = filteredProducts.map(product => this.createProductCard(product));
+            productsGrid.innerHTML = productCards.join('');
+            this.setupProductInteractions();
+        }
+    }
+
+    showAllProducts() {
+        const productsGrid = document.getElementById('productsGrid');
+        const searchInput = document.getElementById('searchInput');
+        
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        
+        const productCards = this.products.map(product => this.createProductCard(product));
+        productsGrid.innerHTML = productCards.join('');
+        this.setupProductInteractions();
     }
 
     trackProductClick(productId) {
@@ -208,14 +378,22 @@ class ShoesApp {
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new ShoesApp();
+    window.shoesApp = new ShoesApp();
 });
 
 // Handle visibility change for performance
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-        // Pause any animations or reduce activity
+        // Pause slideshow when page is hidden
+        const app = window.shoesApp;
+        if (app && app.stopSlideshow) {
+            app.stopSlideshow();
+        }
     } else {
-        // Resume normal activity
+        // Resume slideshow when page becomes visible
+        const app = window.shoesApp;
+        if (app && app.startSlideshow) {
+            app.startSlideshow();
+        }
     }
 });

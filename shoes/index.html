@@ -11,6 +11,54 @@
 </head>
 <body>
     <div class="container">
+        <!-- Hero Section with Image Slider -->
+        <section class="hero" id="heroSection">
+            <div class="slide" data-slide="0">
+                <div class="hero-content">
+                    <h1>Premium 5PS Collection</h1>
+                    <p>Discover the Latest in Athletic Footwear</p>
+                    <a href="#products" class="cta-button">Shop Now</a>
+                </div>
+            </div>
+            <div class="slide" data-slide="1">
+                <div class="hero-content">
+                    <h1>Comfort Meets Style</h1>
+                    <p>Experience the Perfect Blend of Fashion and Function</p>
+                    <a href="#products" class="cta-button">Explore Collection</a>
+                </div>
+            </div>
+            <div class="slide" data-slide="2">
+                <div class="hero-content">
+                    <h1>Step Into Excellence</h1>
+                    <p>Premium Materials, Exceptional Craftsmanship</p>
+                    <a href="#products" class="cta-button">View Products</a>
+                </div>
+            </div>
+            <div class="slider-controls">
+                <button class="slider-dot" data-slide="0" aria-label="Go to slide 1"></button>
+                <button class="slider-dot" data-slide="1" aria-label="Go to slide 2"></button>
+                <button class="slider-dot" data-slide="2" aria-label="Go to slide 3"></button>
+            </div>
+        </section>
+
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    placeholder="Search products..." 
+                    id="searchInput"
+                    aria-label="Search products"
+                >
+                <button class="search-button" id="searchButton" aria-label="Search">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
         <header class="header">
             <h1 class="title">🔥 Featured 5PS Collection</h1>
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
@@ -18,7 +66,7 @@
             </button>
         </header>
 
-        <main class="main">
+        <main class="main" id="products">
             <div class="products-grid" id="productsGrid">
                 <!-- Products will be loaded here -->
             </div>
